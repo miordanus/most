@@ -5,5 +5,8 @@ const nextConfig = {
   images: { unoptimized: true },
   basePath: '/most',
   assetPrefix: '/most',
+  env: {
+    NEXT_PUBLIC_BASE_PATH: '/most',
+  },
 }
 module.exports = nextConfig

@@ -68,7 +68,7 @@ export default function Background() {
             return (
               <img
                 key={`${row}-${col}`}
-                src="/assets/sign.png"
+                src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/assets/sign.png`}
                 alt=""
                 style={{
                   position: 'absolute',
