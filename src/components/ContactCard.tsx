@@ -2,9 +2,10 @@ interface ContactCardProps {
   label: string
   value: string
   sub?: string
+  href?: string
 }
 
-export default function ContactCard({ label, value, sub }: ContactCardProps) {
+export default function ContactCard({ label, value, sub, href }: ContactCardProps) {
   return (
     <div
       style={{
@@ -34,7 +35,20 @@ export default function ContactCard({ label, value, sub }: ContactCardProps) {
           lineHeight: 1.45,
         }}
       >
-        {value}
+        {href ? (
+          <a
+            href={href}
+            style={{
+              color: 'inherit',
+              textDecoration: 'none',
+              transition: 'opacity 0.15s',
+            }}
+            onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.7')}
+            onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}
+          >
+            {value}
+          </a>
+        ) : value}
       </div>
       {sub && (
         <div

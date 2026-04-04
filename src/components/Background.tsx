@@ -18,7 +18,7 @@ const BASE_OPACITIES = [
   // Row 2 — building toward center
   [0.06, 0.09, 0.10, 0.11, 0.09, 0.08, 0.07, 0.05, 0.04, 0.03],
   // Row 3 — peak row (center vertically)
-  [0.07, 0.10, 0.12, 0.13, 0.11, 0.09, 0.07, 0.05, 0.04, 0.03],
+  [0.07, 0.10, 0.11, 0.11, 0.09, 0.08, 0.06, 0.04, 0.03, 0.02],
   // Row 4
   [0.06, 0.08, 0.09, 0.10, 0.08, 0.07, 0.06, 0.04, 0.03, 0.02],
   // Row 5
@@ -57,9 +57,9 @@ export default function Background() {
           height: ROWS * CELL_H,
           // Mask: visible center-left, fades at all edges, extra fade on right
           WebkitMaskImage:
-            'radial-gradient(ellipse 65% 70% at 38% 50%, black 10%, rgba(0,0,0,0.6) 45%, transparent 80%)',
+            'radial-gradient(ellipse 60% 65% at 35% 50%, black 10%, rgba(0,0,0,0.5) 45%, transparent 78%)',
           maskImage:
-            'radial-gradient(ellipse 65% 70% at 38% 50%, black 10%, rgba(0,0,0,0.6) 45%, transparent 80%)',
+            'radial-gradient(ellipse 60% 65% at 35% 50%, black 10%, rgba(0,0,0,0.5) 45%, transparent 78%)',
         }}
       >
         {BASE_OPACITIES.map((rowOpacities, row) =>
