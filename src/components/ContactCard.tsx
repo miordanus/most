@@ -36,16 +36,7 @@ export default function ContactCard({ label, value, sub, href }: ContactCardProp
         }}
       >
         {href ? (
-          <a
-            href={href}
-            style={{
-              color: 'inherit',
-              textDecoration: 'none',
-              transition: 'opacity 0.15s',
-            }}
-            onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.7')}
-            onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}
-          >
+          <a href={href} className="card-value-link">
             {value}
           </a>
         ) : value}
