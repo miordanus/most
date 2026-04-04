@@ -4,27 +4,24 @@
 // Signs at 4 rotations (0 / 90 / 180 / 270) in a deterministic pattern.
 // Opacity fades toward edges — brighter in center-left where content is.
 
-const COLS = 10
-const ROWS = 7
-const CELL_W = 140 // px, spacing between sign centers
-const CELL_H = 120
+const COLS = 5
+const ROWS = 4
+const CELL_W = 300 // px, spacing between sign centers
+const CELL_H = 340
+
+const TILE_W = 280
+const TILE_H = 328
 
 const ROTATIONS = [0, 90, 180, 270]
 const BASE_OPACITIES = [
-  // Row 0 — top, very dim
-  [0.04, 0.03, 0.05, 0.03, 0.04, 0.03, 0.04, 0.03, 0.04, 0.03],
-  // Row 1
-  [0.05, 0.07, 0.06, 0.08, 0.06, 0.07, 0.06, 0.05, 0.04, 0.03],
-  // Row 2 — building toward center
-  [0.06, 0.09, 0.10, 0.11, 0.09, 0.08, 0.07, 0.05, 0.04, 0.03],
-  // Row 3 — peak row (center vertically)
-  [0.07, 0.10, 0.11, 0.11, 0.09, 0.08, 0.06, 0.04, 0.03, 0.02],
-  // Row 4
-  [0.06, 0.08, 0.09, 0.10, 0.08, 0.07, 0.06, 0.04, 0.03, 0.02],
-  // Row 5
-  [0.04, 0.06, 0.07, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.02],
-  // Row 6 — bottom, very dim
-  [0.02, 0.03, 0.04, 0.04, 0.03, 0.03, 0.02, 0.02, 0.02, 0.01],
+  // Row 0 — top, dim
+  [0.04, 0.05, 0.06, 0.04, 0.03],
+  // Row 1 — building toward center
+  [0.06, 0.09, 0.11, 0.07, 0.04],
+  // Row 2 — peak row
+  [0.07, 0.10, 0.11, 0.08, 0.04],
+  // Row 3 — bottom
+  [0.04, 0.06, 0.07, 0.05, 0.02],
 ]
 
 // Deterministic rotation per cell so it looks structured, not random
@@ -68,18 +65,16 @@ export default function Background() {
             return (
               <img
                 key={`${row}-${col}`}
-                src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/assets/sign.png`}
+                src={`/assets/sign.png`}
                 alt=""
                 style={{
                   position: 'absolute',
-                  left: col * CELL_W + CELL_W / 2 - 28,
-                  top: row * CELL_H + CELL_H / 2 - 32,
-                  width: 56,
-                  height: 64,
+                  left: col * CELL_W + CELL_W / 2 - TILE_W / 2,
+                  top: row * CELL_H + CELL_H / 2 - TILE_H / 2,
+                  width: TILE_W,
+                  height: TILE_H,
                   opacity,
                   transform: `rotate(${rotation}deg)`,
-                  // Invert so sign shows as white on dark bg
-                  filter: 'invert(1)',
                   objectFit: 'contain',
                   userSelect: 'none',
                   draggable: false,
