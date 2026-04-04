@@ -14,12 +14,6 @@ const BUTTONS = [
     primary: false,
     external: true,
   },
-  {
-    label: 'Позвонить',
-    href: 'tel:+78362481717',
-    primary: false,
-    external: false,
-  },
 ]
 
 export default function Home() {
@@ -33,14 +27,14 @@ export default function Home() {
           {/* WORDMARK — дизайнерский PNG */}
           <div style={{ marginBottom: 14 }}>
             <img
-              src="/assets/wordmark.png"
+              src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/assets/wordmark.png`}
               alt="МОСТ"
               className="wordmark"
             />
           </div>
 
           {/* TAGLINE */}
-          <p className="tagline">Рестобар с характером.</p>
+          <p className="tagline">Рестобар с характером</p>
 
           {/* CONTACT CARDS */}
           <div className="cards" role="list">
@@ -48,10 +42,10 @@ export default function Home() {
               <ContactCard label="Адрес" value="Воскресенский проспект, 17" sub="2 этаж, Йошкар-Ола" />
             </div>
             <div role="listitem">
-              <ContactCard label="Часы работы" value="Ежедневно" sub="Уточнить по картам" />
+              <ContactCard label="Часы работы" value="Вс–Чт: 12:00–23:00" sub="Пт–Сб: 12:00–01:00" />
             </div>
             <div role="listitem">
-              <ContactCard label="Бронирование" value="+7 (8362) 48-17-17" href="tel:+78362481717" />
+              <ContactCard label="Бронирование" value="+7 (8362) 48-17-17" sub="звонки принимаются с 12:00" href="tel:+78362481717" />
             </div>
           </div>
 

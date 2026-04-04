@@ -57,12 +57,11 @@ body {
 
 /* ── TAGLINE ── */
 .tagline {
-  font-size: 14px;
+  font-size: 36px;
   font-weight: 400;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  margin-bottom: 40px;
+  color: var(--text-primary);
+  margin-bottom: 44px;
+  line-height: 1.2;
 }
 
 /* ── CARDS ── */
