@@ -45,13 +45,13 @@ export default function Home() {
           {/* CONTACT CARDS */}
           <div className="cards" role="list">
             <div role="listitem">
-              <ContactCard label="Адрес" value="Воскресенский пр-кт, 17" sub="2 этаж, Йошкар-Ола" />
+              <ContactCard label="Адрес" value="Воскресенский проспект, 17" sub="2 этаж, Йошкар-Ола" />
             </div>
             <div role="listitem">
               <ContactCard label="Часы работы" value="Ежедневно" sub="Уточнить по картам" />
             </div>
             <div role="listitem">
-              <ContactCard label="Бронирование" value="+7 (8362) 48-17-17" />
+              <ContactCard label="Бронирование" value="+7 (8362) 48-17-17" href="tel:+78362481717" />
             </div>
           </div>
 
