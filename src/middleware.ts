@@ -7,15 +7,11 @@ export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
 
   if (pathname === `/${slug}`) {
-    const url = new URL('/menu', req.url)
-    url.search = req.nextUrl.search
-    return NextResponse.rewrite(url)
+    return NextResponse.rewrite(new URL('/menu', req.url))
   }
   if (pathname.startsWith(`/${slug}/`)) {
     const rest = pathname.slice(slug.length + 1)
-    const url = new URL(`/menu${rest}`, req.url)
-    url.search = req.nextUrl.search
-    return NextResponse.rewrite(url)
+    return NextResponse.rewrite(new URL(`/menu${rest}`, req.url))
   }
 
   return new NextResponse(null, { status: 404 })
