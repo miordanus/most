@@ -18,15 +18,15 @@ export function TopBar({
     <div className="mb-topbar">
       <div className="mb-topbar-left">
         <Wordmark size={wordmarkSize} />
-        <button
-          className={'mb-fav-btn' + (hasItems ? ' has-items' : '')}
-          onClick={onOpenShortlist}
-          aria-label={copy.topbar.favoritesAria(listCount)}
-        >
-          <HeartCounter count={listCount} size={wordmarkSize + 12} color="currentColor" />
-          <span className="mb-fav-label">{copy.topbar.favorites}</span>
-        </button>
       </div>
+      <button
+        className={'mb-fav-btn' + (hasItems ? ' has-items' : '')}
+        onClick={onOpenShortlist}
+        aria-label={copy.topbar.favoritesAria(listCount)}
+      >
+        <HeartCounter count={listCount} size={wordmarkSize + 12} color="currentColor" />
+        <span className="mb-fav-label">{copy.topbar.favorites}</span>
+      </button>
     </div>
   )
 }

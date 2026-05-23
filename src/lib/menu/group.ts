@@ -47,6 +47,7 @@ export function hydrateDishes(
       desc: r.description ?? '',
       price: r.price,
       weight: r.weight_g,
+      weightLabel: r.weight_label ?? null,
       kcal: r.kcal,
       protein: r.protein,
       fat: r.fat,
