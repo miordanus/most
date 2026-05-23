@@ -5,7 +5,7 @@ export const copy = {
   },
   hero: {
     eyebrow: 'МЕНЮ · ВЕЧЕР',
-    headlineLines: ['Добрый вечер.', 'Архитектура вкуса.'],
+    headlineLines: ['Меню МОСТ'],
     subline: 'Кухня работает до 23:30 · Бар — до полуночи',
   },
   featured: {
