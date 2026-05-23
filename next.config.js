@@ -1,7 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  trailingSlash: true,
-  images: { unoptimized: true },
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: 'sfzyqdpckgyznuhunygj.supabase.co' },
+      { protocol: 'https', hostname: 'eda.yandex' },
+    ],
+  },
 }
 module.exports = nextConfig
