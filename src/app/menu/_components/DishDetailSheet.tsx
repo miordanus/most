@@ -158,9 +158,9 @@ export function DishDetailSheet({
           </div>
         )}
 
-        <div className="mb-detail-block">
-          <div className="mb-block-label">{copy.detail.sections.addons}</div>
-          {dish.addons.length > 0 ? (
+        {dish.addons.length > 0 && (
+          <div className="mb-detail-block">
+            <div className="mb-block-label">{copy.detail.sections.addons}</div>
             <div className="mb-opt-list">
               {dish.addons.map((a) => (
                 <label
@@ -180,10 +180,8 @@ export function DishDetailSheet({
                 </label>
               ))}
             </div>
-          ) : (
-            <p className="mb-ingredients">{copy.placeholder.addonsEmpty}</p>
-          )}
-        </div>
+          </div>
+        )}
 
         {dish.mods.length > 0 && (
           <div className="mb-detail-block">

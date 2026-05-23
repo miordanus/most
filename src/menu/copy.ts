@@ -5,7 +5,6 @@ export const copy = {
   },
   hero: {
     eyebrow: 'МЕНЮ · ВЕЧЕР',
-    headlineLines: ['Добрый вечер.', 'Архитектура вкуса.'],
     subline: 'Кухня работает до 23:30 · Бар — до полуночи',
   },
   featured: {
@@ -53,18 +52,16 @@ export const copy = {
   rub: '₽',
   placeholder: {
     dash: '—',
-    addonsEmpty: 'уточняйте у официанта',
-    priceEmpty: 'уточняйте',
   },
 } as const
 
 export function fmtPrice(n: number | null | undefined): string {
-  if (n == null || n === 0) return copy.placeholder.dash
+  if (n == null || n === 0) return ''
   return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 }
 
 export function fmtPriceWithRub(n: number | null | undefined): string {
-  if (n == null || n === 0) return copy.placeholder.priceEmpty
+  if (n == null || n === 0) return ''
   return `${fmtPrice(n)} ${copy.rub}`
 }
 

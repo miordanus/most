@@ -3,7 +3,7 @@
 import type { Dish } from '@/lib/menu/types'
 import { DishMedia } from './brand/DishMedia'
 import { Icon } from './brand/Icon'
-import { copy, fmtNum, fmtPriceWithRub } from '@/menu/copy'
+import { copy, fmtPriceWithRub } from '@/menu/copy'
 
 export function DishCard({
   dish,
@@ -41,16 +41,24 @@ export function DishCard({
         {dish.short && <p className="mb-dish-short">{dish.short}</p>}
         <div className="mb-dish-meta-row">
           <div className="mb-dish-meta">
-            <span>
-              {fmtNum(dish.weight)}
-              {copy.detail.nut.g}
-            </span>
-            <span className="mb-dot" />
-            <span>
-              {fmtNum(dish.kcal)} {copy.detail.nut.kcal}
-            </span>
+            {dish.weight != null && dish.weight > 0 && (
+              <span>
+                {dish.weight}
+                {copy.detail.nut.g}
+              </span>
+            )}
+            {dish.weight != null && dish.weight > 0 && dish.kcal != null && dish.kcal > 0 && (
+              <span className="mb-dot" />
+            )}
+            {dish.kcal != null && dish.kcal > 0 && (
+              <span>
+                {dish.kcal} {copy.detail.nut.kcal}
+              </span>
+            )}
           </div>
-          <div className="mb-dish-price">{fmtPriceWithRub(dish.price)}</div>
+          {dish.price != null && dish.price > 0 && (
+            <div className="mb-dish-price">{fmtPriceWithRub(dish.price)}</div>
+          )}
         </div>
       </div>
     </article>
