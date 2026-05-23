@@ -58,9 +58,11 @@ function uid() {
 export function MenuApp({
   categories,
   dishes,
+  mode = 'prod',
 }: {
   categories: Category[]
   dishes: Dish[]
+  mode?: 'prod' | 'demo'
 }) {
   const [active, setActive] = useState(categories[0]?.id ?? '')
   const [activeDish, setActiveDish] = useState<Dish | null>(null)
@@ -204,7 +206,11 @@ export function MenuApp({
   const clearAll = useCallback(() => setItems([]), [])
 
   return (
-    <div className={'menu-app ' + (isDesktop ? 'is-desktop' : 'is-mobile')}>
+    <div
+      className={
+        'menu-app ' + (isDesktop ? 'is-desktop' : 'is-mobile') + ' is-mode-' + mode
+      }
+    >
       {isDesktop && (
         <DesktopSidebar
           categories={categories}
@@ -241,7 +247,7 @@ export function MenuApp({
             isInList={(id) => inListIds.has(id)}
           />
         ))}
-        <MenuFooter />
+        <MenuFooter mode={mode} />
         <div style={{ height: 120 }} />
       </div>
 
