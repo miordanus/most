@@ -6,6 +6,7 @@ import { TopBar } from './TopBar'
 import { CategoryPills } from './CategoryPills'
 import { DesktopSidebar } from './DesktopSidebar'
 import { Hero } from './Hero'
+import { FeaturedStrip } from './FeaturedStrip'
 import { CategorySection } from './CategorySection'
 import { MenuFooter } from './MenuFooter'
 import { DishDetailSheet, type AddPayload } from './DishDetailSheet'
@@ -85,18 +86,17 @@ export function MenuApp({
     return () => window.removeEventListener('resize', update)
   }, [])
 
-  // Group dishes by category — featured dishes float to the top of their category
+  // Group dishes by category
   const grouped = useMemo(() => {
     const m: Record<string, Dish[]> = {}
     for (const c of categories) m[c.id] = []
     for (const d of dishes) {
       if (m[d.category]) m[d.category].push(d)
     }
-    for (const id of Object.keys(m)) {
-      m[id].sort((a, b) => Number(b.featured) - Number(a.featured))
-    }
     return m
   }, [categories, dishes])
+
+  const featured = useMemo(() => dishes.filter((d) => d.featured), [dishes])
 
   // Section refs for scroll-spy + scroll-to
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
@@ -111,19 +111,11 @@ export function MenuApp({
     (id: string) => {
       setActive(id)
       const target = sectionRefs.current[id]
-      if (!target) return
-      const headerOffset = isDesktop ? 100 : 112
-      const rect = target.getBoundingClientRect()
-      const top = rect.top + window.scrollY - headerOffset
-      // Prefer window scroll; fall back to scrollIntoView if the page itself
-      // doesn't scroll (e.g. a parent has overflow:auto) so a click always lands.
-      const before = window.scrollY
-      window.scrollTo({ top, behavior: 'smooth' })
-      requestAnimationFrame(() => {
-        if (Math.abs(window.scrollY - before) < 1 && Math.abs(top - before) > 4) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }
-      })
+      if (target) {
+        const headerOffset = isDesktop ? 100 : 112
+        const top = target.getBoundingClientRect().top + window.scrollY - headerOffset
+        window.scrollTo({ top, behavior: 'smooth' })
+      }
     },
     [isDesktop],
   )
@@ -229,6 +221,7 @@ export function MenuApp({
 
       <div className="mb-content">
         <Hero />
+        <FeaturedStrip dishes={featured} onOpen={setActiveDish} />
         {categories.map((c, i) => (
           <CategorySection
             key={c.id}

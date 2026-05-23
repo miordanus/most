@@ -48,7 +48,6 @@ function dish(d: Partial<Dish> & Pick<Dish, 'id' | 'category' | 'name'>): Dish {
     desc: '',
     price: null,
     weight: null,
-    weightLabel: null,
     kcal: null,
     protein: null,
     fat: null,
