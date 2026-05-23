@@ -1,4 +1,3 @@
-import { supabaseServer } from '@/lib/supabase/server'
 import { hydrateDishes } from '@/lib/menu/group'
 import type { Category, DishExtraRow, DishRow } from '@/lib/menu/types'
 import { fixtureCategories, fixtureDishes } from '@/menu/fixture'
@@ -11,6 +10,12 @@ export const metadata = {
 }
 
 export default async function MenuPage() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return <MenuApp categories={fixtureCategories} dishes={fixtureDishes} />
+  }
+
+  const { supabaseServer } = await import('@/lib/supabase/server')
+
   const [catsRes, dishesRes, extrasRes] = await Promise.all([
     supabaseServer.from('categories').select('*').order('sort_order'),
     supabaseServer
