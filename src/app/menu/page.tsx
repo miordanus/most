@@ -1,5 +1,6 @@
-import type { Category, Dish, DishExtraRow, DishRow } from '@/lib/menu/types'
+import { supabaseServer } from '@/lib/supabase/server'
 import { hydrateDishes } from '@/lib/menu/group'
+import type { Category, Dish, DishExtraRow, DishRow } from '@/lib/menu/types'
 import { fixtureCategories, fixtureDishes } from '@/menu/fixture'
 import { targetCategories, targetDishes, type TargetDish } from '@/menu/target'
 import { MenuApp } from './_components/MenuApp'
@@ -19,18 +20,6 @@ export default async function MenuPage({
 }) {
   const modeParam = searchParams?.mode
   const mode = Array.isArray(modeParam) ? modeParam[0] : modeParam
-  const isDemo = mode === 'prod' || mode === 'demo'
-
-  if (isDemo) {
-    return (
-      <MenuApp
-        categories={targetCategories}
-        dishes={mergeTarget(targetDishes, [])}
-      />
-    )
-  }
-
-  const { supabaseServer } = await import('@/lib/supabase/server')
 
   const [catsRes, dishesRes, extrasRes] = await Promise.all([
     supabaseServer.from('categories').select('*').order('sort_order'),
@@ -52,6 +41,15 @@ export default async function MenuPage({
 
   const dishes = hydrateDishes(dishRows, extraRows)
 
+  if (mode === 'prod') {
+    return (
+      <MenuApp
+        categories={targetCategories}
+        dishes={mergeTarget(targetDishes, dishes)}
+      />
+    )
+  }
+
   if (dishes.length === 0) {
     return <MenuApp categories={fixtureCategories} dishes={fixtureDishes} />
   }
@@ -67,22 +65,16 @@ function mergeTarget(target: TargetDish[], live: Dish[]): Dish[] {
   const byName = new Map<string, Dish>()
   for (const d of live) byName.set(normName(d.name), d)
 
-  return target.map((t) => {
+  return target.map((t, i) => {
     const hit = byName.get(normName(t.name))
-    if (hit) {
-      return {
-        ...hit,
-        category: t.category,
-        featured: hit.featured || t.featured,
-      }
-    }
-    return {
+    if (hit) return { ...hit, category: t.category }
+    const placeholder: Dish = {
       id: t.id,
       category: t.category,
       name: t.name,
-      short: t.short,
+      short: '',
       desc: '',
-      price: t.price,
+      price: null,
       weight: t.weight_g,
       weightLabel: t.weight_label,
       kcal: t.kcal,
@@ -91,10 +83,12 @@ function mergeTarget(target: TargetDish[], live: Dish[]): Dish[] {
       carbs: t.carbs,
       ingredients: t.ingredients,
       photo: null,
-      featured: t.featured,
+      featured: false,
       addons: [],
       mods: [],
       options: null,
     }
+    void i
+    return placeholder
   })
 }
