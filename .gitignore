@@ -9,4 +9,3 @@ out/
 .DS_Store
 *.local
 .env*
-tsconfig.tsbuildinfo
