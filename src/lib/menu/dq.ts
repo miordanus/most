@@ -16,5 +16,7 @@ export type MenuMode = 'prod' | 'demo'
 
 export function parseMode(raw: string | string[] | undefined): MenuMode {
   const v = Array.isArray(raw) ? raw[0] : raw
-  return v === 'demo' ? 'demo' : 'prod'
+  // Default is `demo` while we're filling in the target menu — we'd rather
+  // show a thin polished view than a wall of placeholders. Prod is opt-in.
+  return v === 'prod' ? 'prod' : 'demo'
 }

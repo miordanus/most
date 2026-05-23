@@ -7,11 +7,15 @@ export function DesktopSidebar({
   categories,
   active,
   onPick,
+  mode = 'demo',
 }: {
   categories: Category[]
   active: string
   onPick: (id: string) => void
+  mode?: 'prod' | 'demo'
 }) {
+  const target = mode === 'prod' ? '/menu' : '/menu?mode=prod'
+  const label = mode === 'prod' ? 'демо · только готовое' : 'весь target-меню'
   return (
     <aside className="dk-side">
       <div className="dk-side-inner">
@@ -35,6 +39,7 @@ export function DesktopSidebar({
           <div className="dk-side-foot-l mb-mono">{copy.footer.phone}</div>
           <div className="dk-side-foot-l">{copy.footer.hours}</div>
           <div className="dk-side-foot-neon">{copy.footer.neon}</div>
+          <a href={target} className="mb-mode-switch">{label}</a>
         </div>
       </div>
     </aside>

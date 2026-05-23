@@ -216,6 +216,7 @@ export function MenuApp({
           categories={categories}
           active={active}
           onPick={handlePickCategory}
+          mode={mode}
         />
       )}
       <div className="mb-stick">
