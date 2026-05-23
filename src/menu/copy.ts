@@ -13,7 +13,6 @@ export const copy = {
     badge: 'Шеф рекомендует',
   },
   card: {
-    focusFlag: 'в фокусе',
     addAria: 'В избранное',
     removeAria: 'В избранном',
   },
