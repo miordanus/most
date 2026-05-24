@@ -16,6 +16,11 @@ export type DishRow = {
   protein: number | null
   fat: number | null
   carbs: number | null
+  kcal_basis: 'per_100g' | 'per_portion' | null
+  kcal_per_portion: number | null
+  protein_per_portion: number | null
+  fat_per_portion: number | null
+  carbs_per_portion: number | null
   ingredients: string | null
   photo_url: string | null
   available: boolean
