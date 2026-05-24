@@ -126,7 +126,18 @@ export async function POST(req: NextRequest) {
     const raw = await readFile(manifestPath, 'utf8')
     const manifest = JSON.parse(raw) as Array<Record<string, unknown>>
     for (const e of manifest) {
-      if (e.staged === safeFile) e.matched_dish_id = body.dish_id
+      if (e.staged === safeFile) {
+        e.matched_dish_id = body.dish_id
+        if (body.crop) {
+          // Persist the exact pixel crop so a future reapply can reproduce it
+          // against a freshly re-staged source (same originals, possibly different
+          // width/quality). Coords are against the staged WebP at its current
+          // dimensions; reapply must read them against the same source.
+          e.crop = { x: body.crop.x, y: body.crop.y, w: body.crop.w, h: body.crop.h }
+        } else {
+          delete e.crop
+        }
+      }
     }
     await writeFile(manifestPath, JSON.stringify(manifest, null, 2))
   } catch {
