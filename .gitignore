@@ -13,3 +13,6 @@ tsconfig.tsbuildinfo
 
 # dish-photo pipeline staged output
 tmp/photos-staged/
+
+# dish-photo originals (kept locally only, never committed)
+most-photos/
