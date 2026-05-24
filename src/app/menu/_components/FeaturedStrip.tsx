@@ -13,11 +13,7 @@ export function FeaturedStrip({
 }) {
   if (!dishes.length) return null
   return (
-    <section className="mb-section" aria-label={copy.featured.sectionTitle}>
-      <header className="mb-section-head">
-        <span className="mb-section-eyebrow">— 01</span>
-        <h2 className="mb-section-title">{copy.featured.sectionTitle}</h2>
-      </header>
+    <section className="mb-section mb-section--featured" aria-label={copy.featured.sectionTitle}>
       <div className="mb-featured-row">
         {dishes.map((d) => (
           <article key={d.id} className="mb-featured-card" onClick={() => onOpen(d)}>

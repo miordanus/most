@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Category, Dish, ShortlistItem } from '@/lib/menu/types'
 import { TopBar } from './TopBar'
 import { CategoryPills } from './CategoryPills'
-import { DesktopSidebar } from './DesktopSidebar'
 import { FeaturedStrip } from './FeaturedStrip'
 import { CategorySection } from './CategorySection'
 import { MenuFooter } from './MenuFooter'
@@ -197,26 +196,17 @@ export function MenuApp({
 
   return (
     <div className={'menu-app ' + (isDesktop ? 'is-desktop' : 'is-mobile')}>
-      {isDesktop && (
-        <DesktopSidebar
-          categories={visibleCategories}
-          active={active}
-          onPick={handlePickCategory}
-        />
-      )}
       <div className="mb-stick">
         <TopBar
           onOpenShortlist={() => setShortOpen(true)}
           listCount={totalCount}
           wordmarkSize={isDesktop ? 28 : 20}
         />
-        {!isDesktop && (
-          <CategoryPills
-            categories={visibleCategories}
-            active={active}
-            onPick={handlePickCategory}
-          />
-        )}
+        <CategoryPills
+          categories={visibleCategories}
+          active={active}
+          onPick={handlePickCategory}
+        />
       </div>
 
       <div className="mb-content">

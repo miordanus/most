@@ -6,7 +6,7 @@ export const copy = {
   hero: {
     eyebrow: 'МЕНЮ · ВЕЧЕР',
     headlineLines: ['Добрый вечер.', 'Архитектура вкуса.'],
-    subline: 'Кухня работает до 23:30 · Бар — до полуночи',
+    subline: 'Кухня · вс–чт до 22:00 · пт–сб до 00:00',
   },
   featured: {
     sectionTitle: 'Сейчас в фокусе',
@@ -47,7 +47,10 @@ export const copy = {
     brand: 'МОСТ · РЕСТОБАР',
     address: 'Йошкар-Ола · Воскресенский пр-кт, 17, 2 этаж',
     phone: '+7 (8362) 48-17-17',
-    hours: 'Кухня до 23:30',
+    hours: {
+      weekday: 'Кухня · вс–чт до 22:00',
+      weekend: 'пт–сб до 00:00',
+    },
     neon: 'NICE TO MEAT YOU',
   },
   rub: '₽',
