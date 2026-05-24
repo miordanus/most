@@ -1,7 +1,7 @@
-import { supabaseServer } from '@/lib/supabase/server'
 import './menudq.css'
 
 export const revalidate = 60
+export const dynamic = 'force-dynamic'
 export const metadata = { robots: { index: false, follow: false } }
 
 type State = 'real' | 'mock' | 'missing'
@@ -94,6 +94,8 @@ export default async function MenuDqPage({
 }) {
   const filter = (searchParams?.filter as FilterKey) || 'all'
   const validFilter: FilterKey = FILTERS.some((f) => f.key === filter) ? filter : 'all'
+
+  const { supabaseServer } = await import('@/lib/supabase/server')
 
   const [catsRes, summaryRes, checklistRes] = await Promise.all([
     supabaseServer.from('categories').select('id,name,sort_order'),
