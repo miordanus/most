@@ -1,0 +1,120 @@
+.menudq-root {
+  --bg: #0a0a0a;
+  --card: #141414;
+  --border: #2a2823;
+  --text-1: #f0efed;
+  --text-2: #8c8983;
+  --text-dim: #4a4845;
+  --green: #5fb86e;
+  --amber: #e8a854;
+  --red: #d64a4f;
+
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text-1);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  padding: 24px 16px 80px;
+}
+
+.menudq-root h1 {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  letter-spacing: -0.01em;
+}
+.menudq-root .lede {
+  color: var(--text-2);
+  margin: 0 0 24px;
+  font-size: 13px;
+}
+.menudq-root h2 {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  margin: 32px 0 12px;
+}
+
+.menudq-root .filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+.menudq-root .filters a {
+  display: inline-block;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: 12px;
+}
+.menudq-root .filters a.active {
+  background: var(--text-1);
+  color: var(--bg);
+  border-color: var(--text-1);
+}
+
+.menudq-root .table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+}
+.menudq-root table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+}
+.menudq-root th,
+.menudq-root td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.menudq-root th {
+  font-weight: 600;
+  color: var(--text-2);
+  background: rgba(255, 255, 255, 0.02);
+  position: sticky;
+  top: 0;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.menudq-root tr:last-child td { border-bottom: none; }
+.menudq-root td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.menudq-root td.dish-name { white-space: normal; min-width: 220px; max-width: 360px; }
+.menudq-root tfoot td { background: rgba(255,255,255,0.03); font-weight: 600; }
+
+.menudq-root .chip {
+  display: inline-block;
+  min-width: 18px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  text-align: center;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+.menudq-root .chip.real    { background: rgba(95,184,110,0.15); color: var(--green); border-color: rgba(95,184,110,0.3); }
+.menudq-root .chip.mock    { background: rgba(232,168,84,0.15); color: var(--amber); border-color: rgba(232,168,84,0.3); }
+.menudq-root .chip.missing { background: transparent; color: var(--text-dim); border-color: var(--border); }
+
+.menudq-root .ms-pending  { color: var(--amber); }
+.menudq-root .ms-approved { color: var(--green); }
+.menudq-root .ms-replaced { color: var(--text-2); }
+
+.menudq-root .completeness {
+  display: inline-block;
+  min-width: 32px;
+  font-weight: 600;
+}
+.menudq-root .completeness.full  { color: var(--green); }
+.menudq-root .completeness.mid   { color: var(--amber); }
+.menudq-root .completeness.low   { color: var(--red); }
