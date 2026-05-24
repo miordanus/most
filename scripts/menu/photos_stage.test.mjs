@@ -64,3 +64,36 @@ test('stagePhotos is idempotent — second run skips existing outputs', async ()
     rmSync(out, { recursive: true, force: true })
   }
 })
+
+test('stagePhotos --force re-processes existing outputs and preserves matched_dish_id', async () => {
+  const src = await setupSourceDir()
+  const out = mkdtempSync(join(tmpdir(), 'photos-out-'))
+  try {
+    // First run at q=82
+    await stagePhotos({ sourceDir: src, outDir: out, width: 1600, quality: 82 })
+
+    // Simulate a prior match: tag IMG_BIG.webp with a dish id in the manifest
+    const manifestPath = join(out, '_manifest.json')
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+    const big = manifest.find((e) => e.staged === 'IMG_BIG.webp')
+    big.matched_dish_id = 'd42'
+    writeFileSync(manifestPath, JSON.stringify(manifest, null, 2))
+
+    // Re-stage at higher quality with --force
+    const second = await stagePhotos({ sourceDir: src, outDir: out, width: 1800, quality: 90, force: true })
+    assert.equal(second.processed.length, 2, 'force should reprocess all')
+    assert.equal(second.skipped.length, 0, 'nothing skipped under force')
+
+    // matched_dish_id must survive the re-stage
+    const after = JSON.parse(readFileSync(manifestPath, 'utf8'))
+    const bigAfter = after.find((e) => e.staged === 'IMG_BIG.webp')
+    assert.equal(bigAfter.matched_dish_id, 'd42', 'matched_dish_id must persist across force re-stage')
+
+    // The reprocessed image should reflect the new width
+    const bigMeta = await sharp(join(out, 'IMG_BIG.webp')).metadata()
+    assert.equal(bigMeta.width, 1800, 'reprocessed file should use new width=1800')
+  } finally {
+    rmSync(src, { recursive: true, force: true })
+    rmSync(out, { recursive: true, force: true })
+  }
+})

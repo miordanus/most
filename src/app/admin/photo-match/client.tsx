@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import Cropper, { type Area } from 'react-easy-crop'
 import { fuzzyMatch } from '@/lib/menu/normalize'
 
 type ManifestEntry = {
@@ -37,6 +38,15 @@ export function PhotoMatchClient({
   const [status, setStatus] = useState<string>('')
   const inputRef = useRef<HTMLInputElement>(null)
 
+  // Cropper state — react-easy-crop's onCropComplete fires with pixel coords
+  // against the source image, which is exactly what the apply API wants.
+  const [cropPos, setCropPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [cropPixels, setCropPixels] = useState<Area | null>(null)
+  const onCropComplete = useCallback((_area: Area, pixels: Area) => {
+    setCropPixels(pixels)
+  }, [])
+
   const total = manifest.length
   const matched = manifest.filter((e) => e.matched_dish_id).length
   const current = cursor >= 0 ? manifest[cursor] : null
@@ -58,6 +68,9 @@ export function PhotoMatchClient({
   function advance() {
     setQuery('')
     setSelectedDishId(null)
+    setCropPos({ x: 0, y: 0 })
+    setZoom(1)
+    setCropPixels(null)
     const next = manifest.findIndex((e, i) => i > cursor && !e.matched_dish_id)
     setCursor(next)
   }
@@ -65,10 +78,13 @@ export function PhotoMatchClient({
   async function applyMatch(dishId: string, replace = false) {
     if (!current) return
     setStatus('uploading…')
+    const crop = cropPixels
+      ? { x: cropPixels.x, y: cropPixels.y, w: cropPixels.width, h: cropPixels.height }
+      : undefined
     const res = await fetch('/api/admin/photo-match/apply', {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-photo-admin-token': token },
-      body: JSON.stringify({ staged_filename: current.staged, dish_id: dishId, replace }),
+      body: JSON.stringify({ staged_filename: current.staged, dish_id: dishId, replace, crop }),
     })
     const data = await res.json().catch(() => ({}))
     if (!res.ok) {
@@ -118,17 +134,43 @@ export function PhotoMatchClient({
       <div style={{ marginBottom: 12, fontSize: 14, color: '#666' }}>
         {matched} / {total} matched · {current.source}
       </div>
-      <img
-        src={`/api/admin/photo-match/preview?file=${encodeURIComponent(current.staged)}&t=${encodeURIComponent(token)}`}
-        alt={current.source}
+      <div
         style={{
+          position: 'relative',
           width: '100%',
           maxWidth: 600,
+          aspectRatio: '3 / 2',
+          background: '#111',
           borderRadius: 8,
-          display: 'block',
-          marginBottom: 16,
+          overflow: 'hidden',
+          marginBottom: 8,
         }}
-      />
+      >
+        <Cropper
+          key={current.staged}
+          image={`/api/admin/photo-match/preview?file=${encodeURIComponent(current.staged)}&t=${encodeURIComponent(token)}`}
+          crop={cropPos}
+          zoom={zoom}
+          aspect={3 / 2}
+          showGrid={true}
+          onCropChange={setCropPos}
+          onZoomChange={setZoom}
+          onCropComplete={onCropComplete}
+        />
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, fontSize: 13, color: '#666' }}>
+        <span>zoom</span>
+        <input
+          type="range"
+          min={1}
+          max={4}
+          step={0.05}
+          value={zoom}
+          onChange={(e) => setZoom(Number(e.target.value))}
+          style={{ flex: 1 }}
+        />
+        <span style={{ width: 40, textAlign: 'right' }}>{zoom.toFixed(2)}×</span>
+      </div>
       <input
         ref={inputRef}
         value={query}

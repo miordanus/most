@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { readFile, writeFile } from 'node:fs/promises'
 import { join, basename } from 'node:path'
 import { createHash } from 'node:crypto'
+import sharp from 'sharp'
 import { revalidatePath } from 'next/cache'
 import { checkPhotoAdminToken } from '@/app/admin/photo-match/_auth'
 import { supabaseService } from '@/lib/supabase/service'
@@ -9,7 +10,15 @@ import { supabaseService } from '@/lib/supabase/service'
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
-type Body = { staged_filename: string; dish_id: string; replace?: boolean }
+type CropBox = { x: number; y: number; w: number; h: number }
+type Body = {
+  staged_filename: string
+  dish_id: string
+  replace?: boolean
+  crop?: CropBox
+}
+
+const OUTPUT_QUALITY = 90
 
 export async function POST(req: NextRequest) {
   const token = req.headers.get('x-photo-admin-token')
@@ -39,6 +48,29 @@ export async function POST(req: NextRequest) {
     buf = await readFile(stagedPath)
   } catch {
     return NextResponse.json({ error: 'staged file not found' }, { status: 404 })
+  }
+
+  // Crop + re-encode if crop coords provided. Skip otherwise — preserves the
+  // raw-upload code path for curl-driven smoke tests.
+  if (body.crop) {
+    const { x, y, w, h } = body.crop
+    const meta = await sharp(buf).metadata()
+    const srcW = meta.width ?? 0
+    const srcH = meta.height ?? 0
+    // Clamp to source bounds (defensive — round any fractional coords)
+    const left = Math.max(0, Math.min(Math.round(x), srcW - 1))
+    const top = Math.max(0, Math.min(Math.round(y), srcH - 1))
+    const width = Math.max(1, Math.min(Math.round(w), srcW - left))
+    const height = Math.max(1, Math.min(Math.round(h), srcH - top))
+    try {
+      buf = await sharp(buf)
+        .extract({ left, top, width, height })
+        .webp({ quality: OUTPUT_QUALITY })
+        .toBuffer()
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      return NextResponse.json({ error: `crop failed: ${msg}` }, { status: 400 })
+    }
   }
 
   const sb = supabaseService()

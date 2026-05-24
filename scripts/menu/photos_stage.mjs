@@ -6,9 +6,17 @@ import sharp from 'sharp'
 
 const EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.heic'])
 
-export async function stagePhotos({ sourceDir, outDir, width = 1600, quality = 82 }) {
+export async function stagePhotos({ sourceDir, outDir, width = 1800, quality = 90, force = false }) {
   if (!existsSync(sourceDir)) throw new Error(`source dir not found: ${sourceDir}`)
   mkdirSync(outDir, { recursive: true })
+
+  // Load existing manifest first so we can preserve matched_dish_id across re-stages
+  const manifestPath = join(outDir, '_manifest.json')
+  let existing = []
+  if (existsSync(manifestPath)) {
+    try { existing = JSON.parse(readFileSync(manifestPath, 'utf8')) } catch { existing = [] }
+  }
+  const existingByName = new Map(existing.map((e) => [e.staged, e]))
 
   const entries = readdirSync(sourceDir)
     .filter((f) => EXTENSIONS.has(extname(f).toLowerCase()))
@@ -22,7 +30,7 @@ export async function stagePhotos({ sourceDir, outDir, width = 1600, quality = 8
     const outPath = join(outDir, stagedName)
     const inPath = join(sourceDir, filename)
 
-    if (existsSync(outPath)) {
+    if (existsSync(outPath) && !force) {
       skipped.push(stagedName)
       continue
     }
@@ -37,6 +45,7 @@ export async function stagePhotos({ sourceDir, outDir, width = 1600, quality = 8
 
     writeFileSync(outPath, buf.data)
 
+    const prevMatch = existingByName.get(stagedName)?.matched_dish_id ?? null
     processed.push({
       staged: stagedName,
       source: filename,
@@ -44,17 +53,10 @@ export async function stagePhotos({ sourceDir, outDir, width = 1600, quality = 8
       bytes_out: buf.data.length,
       w: buf.info.width,
       h: buf.info.height,
-      matched_dish_id: null,
+      matched_dish_id: prevMatch,
     })
   }
 
-  // Manifest: preserve any existing matched_dish_id values, append new entries
-  const manifestPath = join(outDir, '_manifest.json')
-  let existing = []
-  if (existsSync(manifestPath)) {
-    try { existing = JSON.parse(readFileSync(manifestPath, 'utf8')) } catch { existing = [] }
-  }
-  const existingByName = new Map(existing.map((e) => [e.staged, e]))
   for (const p of processed) existingByName.set(p.staged, p)
   const manifest = Array.from(existingByName.values()).sort((a, b) => a.staged.localeCompare(b.staged))
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2))
@@ -71,14 +73,15 @@ function fmtBytes(n) {
 async function main() {
   const args = process.argv.slice(2)
   if (args.length === 0 || args[0].startsWith('-')) {
-    console.error('usage: node scripts/menu/photos_stage.mjs <source_dir> [--out tmp/photos-staged] [--width 1600] [--quality 82]')
+    console.error('usage: node scripts/menu/photos_stage.mjs <source_dir> [--out tmp/photos-staged] [--width 1800] [--quality 90] [--force]')
     process.exit(1)
   }
   const sourceDir = args[0]
-  const opts = { sourceDir, outDir: 'tmp/photos-staged', width: 1600, quality: 82 }
-  for (let i = 1; i < args.length; i += 2) {
+  const opts = { sourceDir, outDir: 'tmp/photos-staged', width: 1800, quality: 90, force: false }
+  for (let i = 1; i < args.length; i++) {
     const k = args[i].replace(/^--/, '')
-    const v = args[i + 1]
+    if (k === 'force') { opts.force = true; continue }
+    const v = args[++i]
     if (k === 'out') opts.outDir = v
     else if (k === 'width') opts.width = Number(v)
     else if (k === 'quality') opts.quality = Number(v)
