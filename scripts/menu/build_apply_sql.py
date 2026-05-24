@@ -71,6 +71,7 @@ def main() -> int:
             f"protein = {sql_int(x.protein)}",
             f"fat = {sql_int(x.fat)}",
             f"carbs = {sql_int(x.carbs)}",
+            "kcal_basis = 'per_100g'",
             "ingredients_source = 'xlsx'",
             "nutrition_source = 'xlsx'",
             "updated_at = now()",
