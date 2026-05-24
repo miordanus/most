@@ -1,5 +1,7 @@
 import type { Category, Dish, OptionGroup, Addon, Mod } from '@/lib/menu/types'
 
+// Nutrition values below are per-portion (matches Dish.kcal semantics post-2026-05 rework).
+
 export const fixtureCategories: Category[] = [
   { id: 'start', name: 'Старт', sort_order: 10 },
   { id: 'salads', name: 'Салаты', sort_order: 20 },
