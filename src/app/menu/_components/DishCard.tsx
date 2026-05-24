@@ -5,6 +5,10 @@ import { DishMedia } from './brand/DishMedia'
 import { Icon } from './brand/Icon'
 import { copy, fmtNum, fmtPriceWithRub } from '@/menu/copy'
 
+const hasVal = (n: number | null | undefined) => n != null && n !== 0
+const hasBzu = (d: Dish) => hasVal(d.protein) && hasVal(d.fat) && hasVal(d.carbs)
+const hasMeta = (d: Dish) => hasVal(d.weight) || hasVal(d.kcal) || hasBzu(d)
+
 export function DishCard({
   dish,
   onOpen,
@@ -40,16 +44,28 @@ export function DishCard({
         <h3 className="mb-dish-name">{dish.name}</h3>
         {dish.short && <p className="mb-dish-short">{dish.short}</p>}
         <div className="mb-dish-meta-row">
-          <div className="mb-dish-meta">
-            <span>
-              {fmtNum(dish.weight)}
-              {copy.detail.nut.g}
-            </span>
-            <span className="mb-dot" />
-            <span>
-              {fmtNum(dish.kcal)} {copy.detail.nut.kcal}
-            </span>
-          </div>
+          {hasMeta(dish) && (
+            <div className="mb-dish-meta">
+              {hasVal(dish.weight) && (
+                <span>
+                  {fmtNum(dish.weight)}
+                  {copy.detail.nut.g}
+                </span>
+              )}
+              {hasVal(dish.weight) && hasVal(dish.kcal) && <span className="mb-dot" />}
+              {hasVal(dish.kcal) && (
+                <span>
+                  {fmtNum(dish.kcal)} {copy.detail.nut.kcal}
+                </span>
+              )}
+              {(hasVal(dish.weight) || hasVal(dish.kcal)) && hasBzu(dish) && <span className="mb-dot" />}
+              {hasBzu(dish) && (
+                <span>
+                  {fmtNum(dish.protein)}/{fmtNum(dish.fat)}/{fmtNum(dish.carbs)} {copy.detail.nut.bzu}
+                </span>
+              )}
+            </div>
+          )}
           <div className="mb-dish-price">{fmtPriceWithRub(dish.price)}</div>
         </div>
       </div>

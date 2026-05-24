@@ -30,7 +30,7 @@ export const copy = {
       addons: 'Дополнения',
       mods: 'Модификации',
     },
-    nut: { g: 'г', kcal: 'ккал', protein: 'бел.', fat: 'жир.', carbs: 'угл.' },
+    nut: { g: 'г', kcal: 'ккал', protein: 'бел.', fat: 'жир.', carbs: 'угл.', bzu: 'бжу' },
   },
   short: {
     eyebrow: '— избранное к столу',
