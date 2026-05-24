@@ -118,3 +118,34 @@
 .menudq-root .completeness.full  { color: var(--green); }
 .menudq-root .completeness.mid   { color: var(--amber); }
 .menudq-root .completeness.low   { color: var(--red); }
+
+.menudq-root details.legend {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 0 0 20px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.menudq-root details.legend summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-1);
+  user-select: none;
+}
+.menudq-root details.legend ul {
+  margin: 10px 0 4px;
+  padding-left: 18px;
+  list-style: none;
+}
+.menudq-root details.legend li {
+  margin: 4px 0;
+  line-height: 1.45;
+}
+.menudq-root details.legend strong {
+  color: var(--text-1);
+  font-weight: 600;
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 12px;
+}
