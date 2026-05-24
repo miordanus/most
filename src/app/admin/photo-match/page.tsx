@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { supabaseServer } from '@/lib/supabase/server'
 import { checkPhotoAdminToken } from './_auth'
 import { PhotoMatchClient } from './client'
 
@@ -28,6 +27,9 @@ export default async function PhotoMatchPage({
   searchParams: { t?: string }
 }) {
   if (!checkPhotoAdminToken(searchParams.t)) notFound()
+
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) notFound()
+  const { supabaseServer } = await import('@/lib/supabase/server')
 
   let manifest: ManifestEntry[] = []
   try {
