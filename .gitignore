@@ -11,8 +11,8 @@ out/
 .env*
 tsconfig.tsbuildinfo
 
-# dish-photo pipeline staged output
-tmp/photos-staged/
+# session scratch (ingest SQL, dev.log, screenshots, staged photo output)
+tmp/
 
 # dish-photo originals (kept locally only, never committed)
 most-photos/
