@@ -72,20 +72,29 @@ function fmtBytes(n) {
 
 async function main() {
   const args = process.argv.slice(2)
-  if (args.length === 0 || args[0].startsWith('-')) {
-    console.error('usage: node scripts/menu/photos_stage.mjs <source_dir> [--out tmp/photos-staged] [--width 1800] [--quality 90] [--force]')
-    process.exit(1)
-  }
-  const sourceDir = args[0]
+  // First non-flag arg is the source dir; defaults to 'most-photos' if absent
+  let sourceDir = 'most-photos'
   const opts = { sourceDir, outDir: 'tmp/photos-staged', width: 1800, quality: 90, force: false }
-  for (let i = 1; i < args.length; i++) {
-    const k = args[i].replace(/^--/, '')
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i]
+    if (!a.startsWith('-')) { sourceDir = a; continue }
+    const k = a.replace(/^--/, '')
     if (k === 'force') { opts.force = true; continue }
+    if (k === 'help' || k === 'h') {
+      console.log('usage: npm run photos:stage -- [source_dir=most-photos] [--out tmp/photos-staged] [--width 1800] [--quality 90] [--force]')
+      process.exit(0)
+    }
     const v = args[++i]
     if (k === 'out') opts.outDir = v
     else if (k === 'width') opts.width = Number(v)
     else if (k === 'quality') opts.quality = Number(v)
   }
+  opts.sourceDir = sourceDir
+  if (!existsSync(sourceDir)) {
+    console.error(`source dir "${sourceDir}" not found. drop your photos there, or pass another path.`)
+    process.exit(1)
+  }
+  console.log(`staging from: ${sourceDir} → ${opts.outDir} · width=${opts.width} q=${opts.quality}${opts.force ? ' (force)' : ''}`)
   const { processed, skipped, manifest } = await stagePhotos(opts)
   const totalIn = processed.reduce((s, e) => s + e.bytes_in, 0)
   const totalOut = processed.reduce((s, e) => s + e.bytes_out, 0)

@@ -4,9 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:clean": "rm -rf .next node_modules/.cache && next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --import tsx --test \"src/**/*.test.ts\""
+    "test": "node --import tsx --test \"src/**/*.test.ts\"",
+    "photos:stage": "node scripts/menu/photos_stage.mjs",
+    "photos:reapply": "node scripts/menu/photos_reapply.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
