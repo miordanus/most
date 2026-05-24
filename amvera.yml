@@ -4,10 +4,8 @@ meta:
     name: npm
     version: '20'
 build:
-  image: node:20-alpine
-  command: npm ci && npm run build
+  additionalCommands: npm run build
 run:
-  image: node:20-alpine
-  command: npm run start
-  port: 3000
+  command: npm start
+  containerPort: 3000
   persistenceMount: /data
