@@ -12,14 +12,10 @@ export type DishRow = {
   description: string | null
   price: number | null
   weight_g: number | null
-  kcal_per_100g: number | null
-  protein_per_100g: number | null
-  fat_per_100g: number | null
-  carbs_per_100g: number | null
-  kcal_per_portion: number | null
-  protein_per_portion: number | null
-  fat_per_portion: number | null
-  carbs_per_portion: number | null
+  kcal: number | null
+  protein: number | null
+  fat: number | null
+  carbs: number | null
   ingredients: string | null
   photo_url: string | null
   available: boolean

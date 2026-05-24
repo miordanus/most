@@ -129,7 +129,7 @@ def load_dishes(path: Path) -> list[DishRow]:
                 category=r.get("category") or "",
                 ingredients=r.get("ingredients"),
                 weight_g=r.get("weight_g"),
-                kcal=r.get("kcal_per_100g"),
+                kcal=r.get("kcal"),
                 name_source=r.get("name_source"),
                 ingredients_source=r.get("ingredients_source"),
                 nutrition_source=r.get("nutrition_source"),
