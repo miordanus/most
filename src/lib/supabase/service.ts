@@ -1,17 +1,20 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 
-let cached: SupabaseClient | null = null
-
-export function supabaseService(): SupabaseClient {
-  if (cached) return cached
+function build() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !key) {
     throw new Error('NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set for admin routes')
   }
-  cached = createClient(url, key, {
+  return createClient(url, key, {
     auth: { persistSession: false },
     db: { schema: 'menu' },
   })
+}
+
+let cached: ReturnType<typeof build> | null = null
+
+export function supabaseService() {
+  if (!cached) cached = build()
   return cached
 }
