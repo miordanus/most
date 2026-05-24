@@ -5,7 +5,6 @@ export const dynamic = 'force-dynamic'
 export const metadata = { robots: { index: false, follow: false } }
 
 type State = 'real' | 'mock' | 'missing'
-type MashaState = 'not_ready' | 'pending' | 'done'
 
 type ChecklistRow = {
   id: string
@@ -14,7 +13,6 @@ type ChecklistRow = {
   available: boolean
   featured: boolean
   is_verified: boolean
-  verified_by_masha: boolean
   mock_status: string | null
   name_state: State
   short_state: State
@@ -23,7 +21,6 @@ type ChecklistRow = {
   ingredients_state: State
   nutrition_state: State
   photo_state: State
-  masha_state: MashaState
   completeness: number
 }
 
@@ -38,22 +35,11 @@ type SummaryRow = {
   missing_kcal: number
   missing_photo: number
   any_mock: number
-  max_done: number
-  masha_pending: number
-  masha_done: number
 }
 
 type CategoryRow = { id: string; name: string; sort_order: number }
 
-type FilterKey =
-  | 'all'
-  | 'mock'
-  | 'missing-photo'
-  | 'missing-desc'
-  | 'featured'
-  | 'max-done'
-  | 'masha-pending'
-  | 'fully-verified'
+type FilterKey = 'all' | 'mock' | 'missing-photo' | 'missing-desc' | 'featured' | 'verified'
 
 const FILTERS: { key: FilterKey; label: string }[] = [
   { key: 'all', label: 'все' },
@@ -61,9 +47,7 @@ const FILTERS: { key: FilterKey; label: string }[] = [
   { key: 'missing-photo', label: 'нет фото' },
   { key: 'missing-desc', label: 'нет описания' },
   { key: 'featured', label: 'избранное' },
-  { key: 'max-done', label: 'Max ✓' },
-  { key: 'masha-pending', label: 'Masha pending' },
-  { key: 'fully-verified', label: 'fully verified' },
+  { key: 'verified', label: 'verified' },
 ]
 
 const FIELD_LEGEND: { key: string; label: string; desc: string }[] = [
@@ -79,20 +63,6 @@ const FIELD_LEGEND: { key: string; label: string; desc: string }[] = [
 function chip(state: State) {
   const sym = state === 'real' ? '✓' : state === 'mock' ? '◐' : '·'
   return <span className={`chip ${state}`}>{sym}</span>
-}
-
-function maxChip(done: boolean) {
-  return done ? (
-    <span className="chip real" title="Max approved">✓</span>
-  ) : (
-    <span className="chip missing" title="Max not done yet">·</span>
-  )
-}
-
-function mashaChip(s: MashaState) {
-  if (s === 'done') return <span className="chip real" title="Masha approved">✓</span>
-  if (s === 'pending') return <span className="chip mock" title="Waiting on Masha">◐</span>
-  return <span className="chip missing" title="Max must verify first">·</span>
 }
 
 function completenessClass(n: number) {
@@ -119,12 +89,8 @@ function applyFilter(rows: ChecklistRow[], f: FilterKey): ChecklistRow[] {
       return rows.filter((r) => r.description_state === 'missing' || r.short_state === 'missing')
     case 'featured':
       return rows.filter((r) => r.featured)
-    case 'max-done':
+    case 'verified':
       return rows.filter((r) => r.is_verified)
-    case 'masha-pending':
-      return rows.filter((r) => r.masha_state === 'pending')
-    case 'fully-verified':
-      return rows.filter((r) => r.verified_by_masha)
     case 'all':
     default:
       return rows
@@ -177,8 +143,6 @@ export default async function MenuDqPage({
       acc.missing_kcal += r.missing_kcal
       acc.missing_photo += r.missing_photo
       acc.any_mock += r.any_mock
-      acc.max_done += r.max_done
-      acc.masha_done += r.masha_done
       return acc
     },
     {
@@ -190,8 +154,6 @@ export default async function MenuDqPage({
       missing_kcal: 0,
       missing_photo: 0,
       any_mock: 0,
-      max_done: 0,
-      masha_done: 0,
     },
   )
 
@@ -214,13 +176,6 @@ export default async function MenuDqPage({
               <strong>{f.label}</strong> — {f.desc}
             </li>
           ))}
-          <li>
-            <strong>Max</strong> — Max подтвердил, что данные в порядке (✓ done · · pending).
-          </li>
-          <li>
-            <strong>Masha</strong> — Маша подтвердила, что блюдо соответствует реальности (✓ done ·
-            ◐ pending когда Max уже готов · · not ready пока Max не подтвердил).
-          </li>
         </ul>
       </details>
 
@@ -238,8 +193,6 @@ export default async function MenuDqPage({
               <th className="num">· нет ingr</th>
               <th className="num">· нет ккал</th>
               <th className="num">· нет фото</th>
-              <th className="num">Max ✓</th>
-              <th className="num">Masha ✓</th>
             </tr>
           </thead>
           <tbody>
@@ -260,12 +213,6 @@ export default async function MenuDqPage({
                 <td className="num">{r.missing_ingr || ''}</td>
                 <td className="num">{r.missing_kcal || ''}</td>
                 <td className="num">{r.missing_photo || ''}</td>
-                <td className="num">
-                  {r.max_done}/{r.dishes}
-                </td>
-                <td className="num">
-                  {r.masha_done}/{r.dishes}
-                </td>
               </tr>
             ))}
           </tbody>
@@ -282,12 +229,6 @@ export default async function MenuDqPage({
               <td className="num">{totals.missing_ingr}</td>
               <td className="num">{totals.missing_kcal}</td>
               <td className="num">{totals.missing_photo}</td>
-              <td className="num">
-                {totals.max_done}/{totals.dishes}
-              </td>
-              <td className="num">
-                {totals.masha_done}/{totals.dishes}
-              </td>
             </tr>
           </tfoot>
         </table>
@@ -322,8 +263,6 @@ export default async function MenuDqPage({
               <th>photo</th>
               <th className="num">% / 7</th>
               <th>mock_status</th>
-              <th>Max</th>
-              <th>Masha</th>
             </tr>
           </thead>
           <tbody>
@@ -334,6 +273,7 @@ export default async function MenuDqPage({
                   <span style={{ color: 'var(--text-dim)', fontSize: 11 }}>
                     {catName.get(r.category) ?? r.category}
                     {r.featured ? ' · ★' : ''}
+                    {r.is_verified ? ' · verified' : ''}
                   </span>
                 </td>
                 <td>{chip(r.name_state)}</td>
@@ -351,8 +291,6 @@ export default async function MenuDqPage({
                 <td className={r.mock_status ? `ms-${r.mock_status}` : ''}>
                   {r.mock_status ?? '—'}
                 </td>
-                <td>{maxChip(r.is_verified)}</td>
-                <td>{mashaChip(r.masha_state)}</td>
               </tr>
             ))}
           </tbody>
