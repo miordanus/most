@@ -1,20 +1,5 @@
 import type { Metadata } from 'next'
-import { Montserrat, JetBrains_Mono } from 'next/font/google'
 import './menu.css'
-
-const montserrat = Montserrat({
-  subsets: ['latin', 'cyrillic'],
-  weight: ['300', '400', '500', '600', '700', '800', '900'],
-  variable: '--font-montserrat',
-  display: 'swap',
-})
-
-const jetbrains = JetBrains_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-jetbrains',
-  display: 'swap',
-})
 
 export const metadata: Metadata = {
   title: 'МОСТ — Меню',
@@ -23,8 +8,16 @@ export const metadata: Metadata = {
 
 export default function MenuLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`${montserrat.variable} ${jetbrains.variable} menu-root`}>
-      {children}
-    </div>
+    <>
+      {/* Browser-loaded Google Fonts. Build-time fetch (next/font/google) fails on
+          Amvera build env which can't reach Google. */}
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap&subset=cyrillic,latin"
+        rel="stylesheet"
+      />
+      <div className="menu-root">{children}</div>
+    </>
   )
 }
