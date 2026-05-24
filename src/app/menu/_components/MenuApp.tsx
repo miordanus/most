@@ -5,7 +5,6 @@ import type { Category, Dish, ShortlistItem } from '@/lib/menu/types'
 import { TopBar } from './TopBar'
 import { CategoryPills } from './CategoryPills'
 import { DesktopSidebar } from './DesktopSidebar'
-import { Hero } from './Hero'
 import { FeaturedStrip } from './FeaturedStrip'
 import { CategorySection } from './CategorySection'
 import { MenuFooter } from './MenuFooter'
@@ -96,6 +95,12 @@ export function MenuApp({
     return m
   }, [categories, dishes])
 
+  // Only categories with at least one dish are navigable / rendered.
+  const visibleCategories = useMemo(
+    () => categories.filter((c) => (grouped[c.id]?.length ?? 0) > 0),
+    [categories, grouped],
+  )
+
   const featured = useMemo(() => dishes.filter((d) => d.featured), [dishes])
 
   // Section refs for scroll-spy + scroll-to
@@ -107,18 +112,13 @@ export function MenuApp({
     [],
   )
 
-  const handlePickCategory = useCallback(
-    (id: string) => {
-      setActive(id)
-      const target = sectionRefs.current[id]
-      if (target) {
-        const headerOffset = isDesktop ? 100 : 112
-        const top = target.getBoundingClientRect().top + window.scrollY - headerOffset
-        window.scrollTo({ top, behavior: 'smooth' })
-      }
-    },
-    [isDesktop],
-  )
+  const handlePickCategory = useCallback((id: string) => {
+    setActive(id)
+    const target = document.querySelector<HTMLElement>(
+      `[data-cat-section="${id}"]`,
+    )
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [])
 
   // Scroll-spy: window scroll
   useEffect(() => {
@@ -128,8 +128,8 @@ export function MenuApp({
       raf = requestAnimationFrame(() => {
         raf = null
         const y = window.scrollY + 140
-        let cur = categories[0]?.id ?? ''
-        for (const c of categories) {
+        let cur = visibleCategories[0]?.id ?? ''
+        for (const c of visibleCategories) {
           const el = sectionRefs.current[c.id]
           if (el && el.offsetTop <= y) cur = c.id
         }
@@ -138,7 +138,7 @@ export function MenuApp({
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [categories])
+  }, [visibleCategories])
 
   const inListIds = useMemo(() => new Set(items.map((it) => it.dish.id)), [items])
   const totalCount = items.reduce((s, it) => s + it.qty, 0)
@@ -199,7 +199,7 @@ export function MenuApp({
     <div className={'menu-app ' + (isDesktop ? 'is-desktop' : 'is-mobile')}>
       {isDesktop && (
         <DesktopSidebar
-          categories={categories}
+          categories={visibleCategories}
           active={active}
           onPick={handlePickCategory}
         />
@@ -212,7 +212,7 @@ export function MenuApp({
         />
         {!isDesktop && (
           <CategoryPills
-            categories={categories}
+            categories={visibleCategories}
             active={active}
             onPick={handlePickCategory}
           />
@@ -220,9 +220,8 @@ export function MenuApp({
       </div>
 
       <div className="mb-content">
-        <Hero />
         <FeaturedStrip dishes={featured} onOpen={setActiveDish} />
-        {categories.map((c, i) => (
+        {visibleCategories.map((c, i) => (
           <CategorySection
             key={c.id}
             ref={setSectionRef(c.id)}

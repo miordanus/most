@@ -1,7 +1,6 @@
 import type { CSSProperties } from 'react'
 
-const MARK_SRC = '/assets/most_mark.png'
-const RATIO = 1605 / 1875
+const SRC = '/assets/wordmark.png'
 
 export function Wordmark({
   size = 22,
@@ -10,40 +9,17 @@ export function Wordmark({
   size?: number
   style?: CSSProperties
 }) {
-  const fontSize = size / 0.74
-  const markHeight = size * 1.18
-  const markWidth = markHeight * RATIO
-
   return (
-    <div
+    <img
+      src={SRC}
+      alt="МОСТ"
       style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        fontFamily: 'var(--font-montserrat), Montserrat, sans-serif',
-        fontWeight: 900,
-        fontSize,
-        lineHeight: 1,
-        color: 'var(--text-1)',
-        letterSpacing: '-0.02em',
+        display: 'inline-block',
+        height: size * 1.2,
+        width: 'auto',
         ...style,
       }}
-      aria-label="МОСТ"
-    >
-      <span>М</span>
-      <img
-        src={MARK_SRC}
-        alt=""
-        width={markWidth}
-        height={markHeight}
-        style={{
-          display: 'inline-block',
-          marginInline: size * 0.03,
-          objectFit: 'contain',
-          flexShrink: 0,
-        }}
-        draggable={false}
-      />
-      <span>СТ</span>
-    </div>
+      draggable={false}
+    />
   )
 }

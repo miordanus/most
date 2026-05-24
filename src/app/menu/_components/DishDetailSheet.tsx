@@ -120,13 +120,15 @@ export function DishDetailSheet({
         <h2 className="mb-detail-name">{dish.name}</h2>
         {dish.desc && <p className="mb-detail-desc">{dish.desc}</p>}
 
-        <div className="mb-nutri">
-          <NutCell label={copy.detail.nut.g} value={dish.weight} />
-          <NutCell label={copy.detail.nut.kcal} value={dish.kcal} />
-          <NutCell label={copy.detail.nut.protein} value={dish.protein} />
-          <NutCell label={copy.detail.nut.fat} value={dish.fat} />
-          <NutCell label={copy.detail.nut.carbs} value={dish.carbs} />
-        </div>
+        {hasAnyNutri(dish) && (
+          <div className="mb-nutri">
+            <NutCell label={copy.detail.nut.g} value={dish.weight} />
+            <NutCell label={copy.detail.nut.kcal} value={dish.kcal} />
+            <NutCell label={copy.detail.nut.protein} value={dish.protein} />
+            <NutCell label={copy.detail.nut.fat} value={dish.fat} />
+            <NutCell label={copy.detail.nut.carbs} value={dish.carbs} />
+          </div>
+        )}
 
         {dish.ingredients && (
           <div className="mb-detail-block">
@@ -158,9 +160,9 @@ export function DishDetailSheet({
           </div>
         )}
 
-        <div className="mb-detail-block">
-          <div className="mb-block-label">{copy.detail.sections.addons}</div>
-          {dish.addons.length > 0 ? (
+        {dish.addons.length > 0 && (
+          <div className="mb-detail-block">
+            <div className="mb-block-label">{copy.detail.sections.addons}</div>
             <div className="mb-opt-list">
               {dish.addons.map((a) => (
                 <label
@@ -180,10 +182,8 @@ export function DishDetailSheet({
                 </label>
               ))}
             </div>
-          ) : (
-            <p className="mb-ingredients">{copy.placeholder.addonsEmpty}</p>
-          )}
-        </div>
+          </div>
+        )}
 
         {dish.mods.length > 0 && (
           <div className="mb-detail-block">
@@ -217,10 +217,21 @@ export function DishDetailSheet({
 }
 
 function NutCell({ label, value }: { label: string; value: number | null }) {
+  if (value == null || value === 0) return null
   return (
     <div className="mb-nutri-cell">
       <div className="mb-nutri-v">{fmtNum(value)}</div>
       <div className="mb-nutri-l">{label}</div>
     </div>
+  )
+}
+
+function hasAnyNutri(d: Dish) {
+  return (
+    (d.weight != null && d.weight !== 0) ||
+    (d.kcal != null && d.kcal !== 0) ||
+    (d.protein != null && d.protein !== 0) ||
+    (d.fat != null && d.fat !== 0) ||
+    (d.carbs != null && d.carbs !== 0)
   )
 }

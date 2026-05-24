@@ -18,6 +18,8 @@ export function TopBar({
     <div className="mb-topbar">
       <div className="mb-topbar-left">
         <Wordmark size={wordmarkSize} />
+      </div>
+      <div className="mb-topbar-right">
         <button
           className={'mb-fav-btn' + (hasItems ? ' has-items' : '')}
           onClick={onOpenShortlist}
