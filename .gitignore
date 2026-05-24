@@ -10,3 +10,6 @@ out/
 *.local
 .env*
 tsconfig.tsbuildinfo
+
+# dish-photo pipeline staged output
+tmp/photos-staged/
