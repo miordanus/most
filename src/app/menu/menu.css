@@ -115,7 +115,7 @@
   appearance: none;
   background: transparent;
   color: var(--text-2);
-  border: none;
+  border: 1px solid transparent;
   padding: 8px 14px;
   font: inherit;
   font-weight: 600;
@@ -124,14 +124,14 @@
   text-transform: uppercase;
   cursor: pointer;
   border-radius: 999px;
-  transition: color 0.15s ease, background 0.15s ease;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
   flex-shrink: 0;
 }
 .mb-pill:hover { color: var(--text-1); }
 .mb-pill.is-active {
   color: var(--text-1);
-  background: var(--card-2);
-  box-shadow: inset 0 0 0 1px var(--border-2);
+  background: transparent;
+  border-color: var(--border-2);
 }
 
 /* ─── CONTENT ───────────────────────────────────────── */
@@ -227,6 +227,27 @@
   text-transform: uppercase;
   padding: 5px 9px;
 }
+.mb-featured-fav {
+  position: absolute;
+  top: 10px; right: 10px;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.mb-featured-fav:hover { background: rgba(0, 0, 0, 0.7); }
+.mb-featured-fav:active { transform: scale(0.92); }
+.mb-featured-fav.is-in { background: var(--accent); }
+.mb-featured-fav.is-in:hover { background: var(--accent-h); }
 .mb-featured-body { padding: 14px 16px 18px; }
 .mb-featured-name {
   font-weight: 800;
@@ -412,6 +433,8 @@
   flex-direction: column;
   transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
   box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
+  touch-action: pan-y;
+  overscroll-behavior: contain;
 }
 .mb-sheet--sheet {
   left: 0; right: 0; bottom: 0;
@@ -461,6 +484,7 @@
   -webkit-overflow-scrolling: touch;
   position: relative;
   min-height: 0;
+  overscroll-behavior: contain;
 }
 .mb-sheet-body::-webkit-scrollbar { display: none; }
 .mb-sheet-body { -ms-overflow-style: none; scrollbar-width: none; }
@@ -842,17 +866,22 @@
     margin: 0 auto;
   }
 
-  /* Category strip on desktop: bigger pills, centered row */
+  /* Category strip on desktop: bigger pills, more breathing room */
   .menu-app.is-desktop .mb-pills-inner {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 14px 40px 16px;
-    gap: 6px;
+    padding: 18px 40px 22px;
+    gap: 4px;
   }
   .menu-app.is-desktop .mb-pill {
+    font-size: 13px;
+    letter-spacing: 0.22em;
+    padding: 12px 22px;
+  }
+  .menu-app.is-desktop .mb-fav-btn {
     font-size: 12px;
-    letter-spacing: 0.18em;
-    padding: 10px 18px;
+    letter-spacing: 0.22em;
+    gap: 12px;
   }
 
   .menu-app.is-desktop .mb-hero {

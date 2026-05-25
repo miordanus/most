@@ -20,12 +20,12 @@ export function HeartCounter({
       />
       <text
         x="16"
-        y="16"
+        y="14.7"
         textAnchor="middle"
         dominantBaseline="central"
         fontFamily="var(--font-jetbrains), 'JetBrains Mono', monospace"
-        fontWeight={500}
-        fontSize={11}
+        fontWeight={600}
+        fontSize={13}
         fill={color}
       >
         {count}

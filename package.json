@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:clean": "rm -rf .next node_modules/.cache && next dev",
+    "prepare": "git config core.hooksPath .githooks || true",
     "build": "next build",
     "start": "next start",
     "test": "node --import tsx --test \"src/**/*.test.ts\"",

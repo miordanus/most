@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+# Pre-push guard: a clean production build must succeed before pushing.
+# Catches compile/type breakage before it reaches Amvera (which runs `npm run build`).
+# Bypass in a genuine emergency with: git push --no-verify
+
+echo "[pre-push] clean build check (rm -rf .next && npm run build)…"
+
+rm -rf .next
+if ! npm run build; then
+  echo "[pre-push] ✗ build failed — push aborted. Fix the build, then push again."
+  exit 1
+fi
+
+echo "[pre-push] ✓ build OK — pushing."
+exit 0

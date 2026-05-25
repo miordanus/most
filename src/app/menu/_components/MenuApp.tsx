@@ -126,18 +126,22 @@ export function MenuApp({
       if (raf) return
       raf = requestAnimationFrame(() => {
         raf = null
-        const y = window.scrollY + 140
+        const headerH = isDesktop ? 150 : 108 // topbar + pills + slack
         let cur = visibleCategories[0]?.id ?? ''
         for (const c of visibleCategories) {
           const el = sectionRefs.current[c.id]
-          if (el && el.offsetTop <= y) cur = c.id
+          if (el && el.getBoundingClientRect().top - headerH <= 1) cur = c.id
         }
         setActive((prev) => (prev === cur ? prev : cur))
       })
     }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [visibleCategories])
+    // Scroll happens on <body> (globals: html,body{height:100%} + overflow),
+    // not on window — so listen in the capture phase to catch it regardless of
+    // which element actually scrolls.
+    window.addEventListener('scroll', onScroll, { passive: true, capture: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll, { capture: true } as EventListenerOptions)
+  }, [visibleCategories, isDesktop])
 
   const inListIds = useMemo(() => new Set(items.map((it) => it.dish.id)), [items])
   const totalCount = items.reduce((s, it) => s + it.qty, 0)
@@ -171,6 +175,17 @@ export function MenuApp({
     [addToList],
   )
 
+  const toggleQuick = useCallback(
+    (dish: Dish) => {
+      if (inListIds.has(dish.id)) {
+        setItems((prev) => prev.filter((it) => it.dish.id !== dish.id))
+      } else {
+        handleAddQuick(dish)
+      }
+    },
+    [inListIds, handleAddQuick],
+  )
+
   const handleAddFromDetail = useCallback(
     (p: AddPayload) => {
       addToList(p)
@@ -200,7 +215,7 @@ export function MenuApp({
         <TopBar
           onOpenShortlist={() => setShortOpen(true)}
           listCount={totalCount}
-          wordmarkSize={isDesktop ? 28 : 20}
+          wordmarkSize={isDesktop ? 36 : 20}
         />
         <CategoryPills
           categories={visibleCategories}
@@ -210,7 +225,12 @@ export function MenuApp({
       </div>
 
       <div className="mb-content">
-        <FeaturedStrip dishes={featured} onOpen={setActiveDish} />
+        <FeaturedStrip
+          dishes={featured}
+          onOpen={setActiveDish}
+          onAdd={toggleQuick}
+          isInList={(id) => inListIds.has(id)}
+        />
         {visibleCategories.map((c, i) => (
           <CategorySection
             key={c.id}
@@ -219,7 +239,7 @@ export function MenuApp({
             index={i + 1}
             dishes={grouped[c.id] ?? []}
             onOpen={setActiveDish}
-            onAdd={handleAddQuick}
+            onAdd={toggleQuick}
             isInList={(id) => inListIds.has(id)}
           />
         ))}

@@ -13,8 +13,8 @@ and visually compare to the prior screenshot:
 - `src/app/globals.css`, `src/app/menu/menu.css`, `src/app/menudq/menudq.css`
 - Any component under `src/app/menu/_components/` (esp. `brand/`)
 - `tailwind.config.ts`, `postcss.config.js`, `next.config.js`
-- Anything touching `<Wordmark>`, `<TopBar>`, `<DesktopSidebar>`, `<DishCard>`, `<DishMedia>`,
-  the hero, the favorites/shortlist UI, or sticky-header layout
+- Anything touching `<Wordmark>`, `<TopBar>`, `<CategoryPills>`, `<DishCard>`, `<DishMedia>`,
+  `<FeaturedStrip>`, the favorites/shortlist UI, or sticky-header layout
 
 Quick recipe (dev server already running on :3000):
 
@@ -35,13 +35,40 @@ suggesting the commit**.
 Specifically watch for:
 - Wordmark dimensions and the red arch's vertical alignment in the logo
 - TopBar horizontal balance (logo left, favorites right, neither cropped)
-- Sticky header height matching `scroll-margin-top` on sections (`.mb-cat-section`)
+- Sticky header height matching `scroll-margin-top` on sections (`.mb-cat-section`);
+  the same height feeds the scroll-spy threshold in `MenuApp.tsx` (`headerH`)
 - DishCard photo aspect ratio and the brand placeholder when `photo_url` is null
-- Pills/sidebar active-state colors and the category number gutter
+- Pills active-state (outlined: transparent fill, `--border-2` ring, white text) — NOT a
+  loud red fill; the same look applies on click AND on scroll-spy highlight
 
-If headless screenshots show mobile pills instead of the desktop sidebar, that's expected
-in SSR — `MenuApp.tsx` sets `isDesktop` via a client `useEffect`. Test desktop interactions
-in a real browser at desktop width.
+`MenuApp.tsx` sets `isDesktop` via a client `useEffect`, so SSR/headless always renders the
+mobile tree first. Both viewports now use the **same top category strip** (`<CategoryPills>`);
+there is no longer a desktop sidebar. Test desktop interactions in a real browser at ≥900px.
+
+## /menu layout (current)
+
+- **Single top strip on both viewports.** `MenuApp.tsx` renders `<TopBar>` (wordmark left,
+  heart+«ИЗБРАННОЕ» right) and `<CategoryPills>` (horizontal category strip) inside `.mb-stick`.
+  The old `DesktopSidebar` is **removed** — don't reintroduce a sidebar. Desktop is a single
+  centered column (`.menu-app.is-desktop { display: block }`, `.mb-content` max-width 1200px).
+- **FeaturedStrip** has no section header (the «— 01 СЕЙЧАС В ФОКУСЕ» eyebrow/title were dropped);
+  category numbering starts at 01 on the first real category.
+- **Favorites heart** (`HeartCounter`) shows the live count inside the heart; card hearts
+  **toggle** (tap to add, tap again to remove via `toggleQuick` in `MenuApp.tsx`).
+- **Detail sheet** (`BottomSheet` variant `sheet`) is swipe-down-to-dismiss on mobile; the hero
+  sets an inline `background-image` (`/_next/image…&w=640`) so the photo doesn't flash on open.
+- **Opening hours** live in `copy.footer.hours = { weekday, weekend }`, rendered as two lines in
+  `MenuFooter` (shown on desktop too — footer is no longer hidden at ≥900px).
+- **Favicon** = the МОСТ arch, wired via `metadata.icons` → `/assets/most_mark.png` in
+  `src/app/layout.tsx`.
+
+## Push / build safety
+
+- **Pre-push hook:** `.githooks/pre-push` runs `rm -rf .next && npm run build` and blocks the
+  push if the build fails (catches breakage before Amvera). Enabled via `core.hooksPath`,
+  auto-set by the `prepare` npm script on `npm install`. Emergency bypass: `git push --no-verify`.
+- Amvera deploys with a clean `npm run build` (`amvera.yml`), so the prod build never sees a
+  stale `.next`. That staleness is a **local dev** problem only (see below).
 
 ## Project-specific gotchas
 
@@ -57,9 +84,10 @@ in a real browser at desktop width.
   should mark it (planned `~` prefix). Empty addons must NOT render a fallback like
   "уточняйте у официанта" — section is hidden when `dish.addons.length === 0` (see
   `DishDetailSheet.tsx`).
-- **Dev server:** Next 14 `.next/` cache occasionally goes stale (`Cannot find module './XXX.js'`).
-  Fix: kill the dev process, `rm -rf .next`, restart `npm run dev`. Don't just retry —
-  the cache will keep failing.
+- **Dev server:** Next 14 `.next/` cache occasionally goes stale — symptom is a 500 on
+  `/_next/static/css/...` or `Cannot find module './XXX.js'` (styles look "broken" in the
+  browser even though the source is fine). Fix: kill the dev process, `rm -rf .next`, restart
+  (`npm run dev:clean` does this). Don't just retry — the cache will keep failing.
 - **DB writes:** `menu.import_runs` table is the audit log — any bulk DB change should
   insert one row describing what ran and why.
 

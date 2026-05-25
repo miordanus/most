@@ -98,7 +98,18 @@ export function DishDetailSheet({
       footer={footer}
       className="mb-sheet--detail"
     >
-      <div className="mb-detail-hero">
+      <div
+        className="mb-detail-hero"
+        style={
+          dish.photo
+            ? {
+                backgroundImage: `url(/_next/image?url=${encodeURIComponent(dish.photo)}&w=640&q=75)`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }
+            : undefined
+        }
+      >
         <DishMedia
           photo={dish.photo}
           ratio={variant === 'modal' ? '16 / 9' : '4 / 3'}
