@@ -41,7 +41,12 @@ export function FeaturedStrip({
               <div className="mb-featured-body">
                 <h3 className="mb-featured-name">{d.name}</h3>
                 {d.short && <p className="mb-featured-short">{d.short}</p>}
-                <div className="mb-featured-price">{fmtPriceWithRub(d.price)}</div>
+                <div className="mb-featured-price">
+                  {fmtPriceWithRub(d.price)}
+                  {d.pricePer100g && d.price != null && d.price !== 0 && (
+                    <span className="mb-price-unit">{copy.card.per100}</span>
+                  )}
+                </div>
               </div>
             </article>
           )

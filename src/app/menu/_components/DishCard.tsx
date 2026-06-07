@@ -66,7 +66,12 @@ export function DishCard({
               )}
             </div>
           )}
-          <div className="mb-dish-price">{fmtPriceWithRub(dish.price)}</div>
+          <div className="mb-dish-price">
+            {fmtPriceWithRub(dish.price)}
+            {dish.pricePer100g && dish.price != null && dish.price !== 0 && (
+              <span className="mb-price-unit">{copy.card.per100}</span>
+            )}
+          </div>
         </div>
       </div>
     </article>

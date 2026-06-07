@@ -16,6 +16,7 @@ export const copy = {
     focusFlag: 'в фокусе',
     addAria: 'В избранное',
     removeAria: 'В избранном',
+    per100: '/100 г',
   },
   section: {
     positions: (n: number) => `${n} позиций`,

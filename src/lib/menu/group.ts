@@ -54,6 +54,7 @@ export function hydrateDishes(
       ingredients: r.ingredients ?? '',
       photo: r.photo_url,
       featured: r.featured,
+      pricePer100g: r.price_per_100g ?? false,
       addons,
       mods,
       options,

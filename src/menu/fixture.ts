@@ -55,6 +55,7 @@ function dish(d: Partial<Dish> & Pick<Dish, 'id' | 'category' | 'name'>): Dish {
     ingredients: '',
     photo: null,
     featured: false,
+    pricePer100g: false,
     addons: [],
     mods: [],
     options: null,

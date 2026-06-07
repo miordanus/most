@@ -25,6 +25,7 @@ export type DishRow = {
   photo_url: string | null
   available: boolean
   featured: boolean
+  price_per_100g: boolean | null
   sort_order: number
 }
 
@@ -63,6 +64,7 @@ export type Dish = {
   ingredients: string
   photo: string | null
   featured: boolean
+  pricePer100g: boolean
   addons: Addon[]
   mods: Mod[]
   options: OptionGroup | null
