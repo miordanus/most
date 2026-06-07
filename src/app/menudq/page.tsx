@@ -1,4 +1,5 @@
 import './menudq.css'
+import ExportGaps from './ExportGaps'
 
 export const revalidate = 60
 export const dynamic = 'force-dynamic'
@@ -13,6 +14,8 @@ type ChecklistRow = {
   available: boolean
   featured: boolean
   is_verified: boolean
+  verified_by_masha: boolean
+  masha_state: 'not_ready' | 'pending' | 'done'
   mock_status: string | null
   name_state: State
   short_state: State
@@ -23,6 +26,24 @@ type ChecklistRow = {
   photo_state: State
   completeness: number
 }
+
+type DishContent = {
+  short: string | null
+  description: string | null
+  ingredients: string | null
+  weight_g: number | null
+  weight_label: string | null
+  kcal: number | null
+  protein: number | null
+  fat: number | null
+  carbs: number | null
+  kcal_basis: 'per_100g' | 'per_portion' | null
+}
+
+// A checklist row enriched with the dish's actual content, for the Masha CSV template.
+type ExportRow = ChecklistRow & DishContent
+
+export type { ChecklistRow, ExportRow }
 
 type SummaryRow = {
   category: string
@@ -39,13 +60,25 @@ type SummaryRow = {
 
 type CategoryRow = { id: string; name: string; sort_order: number }
 
-type FilterKey = 'all' | 'mock' | 'missing-photo' | 'missing-desc' | 'featured' | 'verified'
+type FilterKey =
+  | 'all'
+  | 'mock'
+  | 'missing-photo'
+  | 'missing-short'
+  | 'missing-desc'
+  | 'missing-kcal'
+  | 'masha'
+  | 'featured'
+  | 'verified'
 
 const FILTERS: { key: FilterKey; label: string }[] = [
   { key: 'all', label: 'все' },
   { key: 'mock', label: 'есть мок' },
   { key: 'missing-photo', label: 'нет фото' },
-  { key: 'missing-desc', label: 'нет описания' },
+  { key: 'missing-short', label: 'нет short' },
+  { key: 'missing-desc', label: 'нет desc' },
+  { key: 'missing-kcal', label: 'нет ккал/БЖУ' },
+  { key: 'masha', label: 'у Маши' },
   { key: 'featured', label: 'избранное' },
   { key: 'verified', label: 'verified' },
 ]
@@ -85,8 +118,14 @@ function applyFilter(rows: ChecklistRow[], f: FilterKey): ChecklistRow[] {
       )
     case 'missing-photo':
       return rows.filter((r) => r.photo_state === 'missing')
+    case 'missing-short':
+      return rows.filter((r) => r.short_state === 'missing')
     case 'missing-desc':
-      return rows.filter((r) => r.description_state === 'missing' || r.short_state === 'missing')
+      return rows.filter((r) => r.description_state === 'missing')
+    case 'missing-kcal':
+      return rows.filter((r) => r.nutrition_state === 'missing')
+    case 'masha':
+      return rows.filter((r) => r.masha_state === 'pending')
     case 'featured':
       return rows.filter((r) => r.featured)
     case 'verified':
@@ -107,15 +146,21 @@ export default async function MenuDqPage({
 
   const { supabaseServer } = await import('@/lib/supabase/server')
 
-  const [catsRes, summaryRes, checklistRes] = await Promise.all([
+  const [catsRes, summaryRes, checklistRes, dishesRes] = await Promise.all([
     supabaseServer.from('categories').select('id,name,sort_order'),
     supabaseServer.from('dq_summary').select('*'),
     supabaseServer.from('dq_checklist').select('*'),
+    supabaseServer
+      .from('dishes')
+      .select(
+        'id,short,description,ingredients,weight_g,weight_label,kcal,protein,fat,carbs,kcal_basis',
+      ),
   ])
 
   if (catsRes.error) throw catsRes.error
   if (summaryRes.error) throw summaryRes.error
   if (checklistRes.error) throw checklistRes.error
+  if (dishesRes.error) throw dishesRes.error
 
   const cats = (catsRes.data ?? []) as CategoryRow[]
   const catName = new Map(cats.map((c) => [c.id, c.name]))
@@ -132,6 +177,38 @@ export default async function MenuDqPage({
     if (ca !== cb) return ca - cb
     return a.name.localeCompare(b.name, 'ru')
   })
+
+  // Enrich rows with the dish's real content for the Masha fill-in CSV template.
+  const EMPTY_CONTENT: DishContent = {
+    short: null,
+    description: null,
+    ingredients: null,
+    weight_g: null,
+    weight_label: null,
+    kcal: null,
+    protein: null,
+    fat: null,
+    carbs: null,
+    kcal_basis: null,
+  }
+  const contentById = new Map(
+    ((dishesRes.data ?? []) as ({ id: string } & DishContent)[]).map((d) => [d.id, d]),
+  )
+  const enrich = (r: ChecklistRow): ExportRow => ({ ...EMPTY_CONTENT, ...contentById.get(r.id), ...r })
+  const exportRows = filtered.map(enrich)
+
+  // 2–3 fully-complete real dishes as «ПРИМЕР» reference rows in the template.
+  const examples = checklistAll
+    .filter(
+      (r) =>
+        r.short_state === 'real' &&
+        r.description_state === 'real' &&
+        r.ingredients_state === 'real' &&
+        r.nutrition_state === 'real',
+    )
+    .sort((a, b) => Number(b.is_verified) - Number(a.is_verified))
+    .slice(0, 3)
+    .map(enrich)
 
   const totals = summary.reduce(
     (acc, r) => {
@@ -249,6 +326,12 @@ export default async function MenuDqPage({
           </a>
         ))}
       </div>
+      <ExportGaps
+        rows={exportRows}
+        examples={examples}
+        catNames={Object.fromEntries(cats.map((c) => [c.id, c.name]))}
+        filterLabel={FILTERS.find((f) => f.key === validFilter)?.label ?? 'все'}
+      />
       <div className="table-wrap">
         <table>
           <thead>
@@ -274,6 +357,11 @@ export default async function MenuDqPage({
                     {catName.get(r.category) ?? r.category}
                     {r.featured ? ' · ★' : ''}
                     {r.is_verified ? ' · verified' : ''}
+                    {r.verified_by_masha
+                      ? ' · ✓Маша'
+                      : r.masha_state === 'pending'
+                        ? ' · ждёт Машу'
+                        : ''}
                   </span>
                 </td>
                 <td>{chip(r.name_state)}</td>
