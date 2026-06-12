@@ -14,7 +14,7 @@ and visually compare to the prior screenshot:
 - Any component under `src/app/menu/_components/` (esp. `brand/`)
 - `tailwind.config.ts`, `postcss.config.js`, `next.config.js`
 - Anything touching `<Wordmark>`, `<TopBar>`, `<CategoryPills>`, `<DishCard>`, `<DishMedia>`,
-  `<FeaturedStrip>`, the favorites/shortlist UI, or sticky-header layout
+  `<FeaturedStrip>`, `<ShortlistSheet>`, the favorites/shortlist UI, or sticky-header layout
 
 Quick recipe (dev server already running on :3000):
 
@@ -55,12 +55,49 @@ there is no longer a desktop sidebar. Test desktop interactions in a real browse
   category numbering starts at 01 on the first real category.
 - **Favorites heart** (`HeartCounter`) shows the live count inside the heart; card hearts
   **toggle** (tap to add, tap again to remove via `toggleQuick` in `MenuApp.tsx`).
+- **ShortlistSheet** (`BottomSheet` variant `sheet`) opens from the `HeartCounter` button. It
+  shows the guest's favorited dishes with quantity controls and a total, under the eyebrow
+  «— избранное к столу». The CTA instructs showing the list to a waiter — this is NOT online
+  ordering. Swipe-down-to-dismiss on mobile.
 - **Detail sheet** (`BottomSheet` variant `sheet`) is swipe-down-to-dismiss on mobile; the hero
   sets an inline `background-image` (`/_next/image…&w=640`) so the photo doesn't flash on open.
+- **Per-100g pricing:** dishes with `price_per_100g = true` (steaks, pork ribs, ossobuco) render
+  a quiet `/100 г` suffix next to the price in `DishCard` and detail. Copy key: `copy.card.per100`.
 - **Opening hours** live in `copy.footer.hours = { weekday, weekend }`, rendered as two lines in
   `MenuFooter` (shown on desktop too — footer is no longer hidden at ≥900px).
 - **Favicon** = the МОСТ arch, wired via `metadata.icons` → `/assets/most_mark.png` in
   `src/app/layout.tsx`.
+
+## /menudq — internal kitchen data-quality tool
+
+Internal route (`robots: noindex`). Shows the data-quality checklist for all dishes.
+
+- **Gap export** (`ExportGaps.tsx`): generates a copy-paste text list + downloadable CSV of
+  dishes missing real data (name / short / desc / price / ingredients / kcal+БЖУ / photo).
+  Used by the team to brief Masha (content person) on what needs filling in.
+- **DQ checklist columns** (from `menu.dq_checklist` view): `name_state`, `short_state`,
+  `description_state`, `price_state`, `ingredients_state`, `nutrition_state`, `photo_state`
+  (each: `'real' | 'mock' | 'missing'`), plus `is_verified`, `verified_by_masha`,
+  `masha_state` (`'not_ready' | 'pending' | 'done'`), `completeness` (0–1 float).
+- No auth on this route currently — it's obscure-URL access only.
+
+## Categories (canonical 8, paper-menu order)
+
+After migration 0004, the DB has exactly these categories (slug → display name):
+
+| slug | name | sort_order |
+|------|------|-----------|
+| `snacks` | Закуски | 10 |
+| `salads` | Салаты | 20 |
+| `soups` | Супы | 30 |
+| `burgers` | Бургеры | 40 |
+| `sandwiches` | Сэндвичи и брускетты | 50 |
+| `mains` | Еда | 60 |
+| `grill` | Мангал | 70 |
+| `desserts` | Десерты | 80 |
+
+Напитки are served separately and not in the DB yet.
+Крылья → `snacks`. Паста → `mains`. Рёбра → `grill`. Картофель фри → `snacks`. No Гарниры, no Рис.
 
 ## Push / build safety
 
@@ -80,6 +117,8 @@ there is no longer a desktop sidebar. Test desktop interactions in a real browse
   (view), `menu.dq_summary` (view), `menu.import_runs`. Source columns accept only
   `menu_photo | xlsx | fixture | manual | mockup | unknown` (CHECK constraint
   `dishes_source_values_chk`). Don't try `'real'` — view treats anything ≠ `'mockup'` as real.
+- **`price_per_100g` column:** `boolean NOT NULL DEFAULT false` on `menu.dishes`. Set to `true`
+  on steaks (6), pork ribs (3), ossobuco (1). `DishRow.price_per_100g` → `Dish.pricePer100g`.
 - **Mock marker UX:** when `*_source = 'mockup'` on a dish field, public `/menu` rendering
   should mark it (planned `~` prefix). Empty addons must NOT render a fallback like
   "уточняйте у официанта" — section is hidden when `dish.addons.length === 0` (see
