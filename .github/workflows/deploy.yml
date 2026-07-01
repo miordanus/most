@@ -14,6 +14,11 @@ jobs:
           fetch-depth: 0
 
       - name: Push to Amvera
+        env:
+          AMVERA_USERNAME: ${{ secrets.AMVERA_USERNAME }}
+          AMVERA_PASSWORD: ${{ secrets.AMVERA_PASSWORD }}
         run: |
-          git remote add amvera https://${{ secrets.AMVERA_USERNAME }}:${{ secrets.AMVERA_PASSWORD }}@git.msk0.amvera.ru/miordanus/most
+          git config --global credential.helper store
+          echo "https://${AMVERA_USERNAME}:${AMVERA_PASSWORD}@git.msk0.amvera.ru" > ~/.git-credentials
+          git remote add amvera https://git.msk0.amvera.ru/miordanus/most
           git push amvera HEAD:main --force
