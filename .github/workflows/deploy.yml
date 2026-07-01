@@ -18,7 +18,14 @@ jobs:
           AMVERA_USERNAME: ${{ secrets.AMVERA_USERNAME }}
           AMVERA_PASSWORD: ${{ secrets.AMVERA_PASSWORD }}
         run: |
-          git config --global credential.helper store
-          echo "https://${AMVERA_USERNAME}:${AMVERA_PASSWORD}@git.msk0.amvera.ru" > ~/.git-credentials
+          cat > /tmp/git-askpass.sh << 'EOF'
+          #!/bin/sh
+          case "$1" in
+            Username*) echo "$AMVERA_USERNAME" ;;
+            Password*) echo "$AMVERA_PASSWORD" ;;
+          esac
+          EOF
+          chmod +x /tmp/git-askpass.sh
+          export GIT_ASKPASS=/tmp/git-askpass.sh
           git remote add amvera https://git.msk0.amvera.ru/miordanus/most
           git push amvera HEAD:main --force
