@@ -108,7 +108,8 @@ After migration 0004, the DB has exactly these categories (slug → display name
   push if the build fails (catches breakage before Amvera). Enabled via `core.hooksPath`,
   auto-set by the `prepare` npm script on `npm install`. Emergency bypass: `git push --no-verify`.
 - **Deploy pipeline:** push to `main` → GitHub Actions (`.github/workflows/deploy.yml`) pushes
-  to the Amvera git remote → Amvera runs `npm run build && npm start`. Credentials stored as
+  `HEAD:master` on `git.msk1.amvera.ru/miordanus/most` (region Moscow-1; Amvera builds
+  **master**, not main — msk0 is retired) → Amvera runs `npm run build && npm start`. Credentials stored as
   `AMVERA_USERNAME` / `AMVERA_PASSWORD` repository secrets. No manual `git push amvera` needed.
 - Amvera deploys with a clean `npm run build` (`amvera.yml`), so the prod build never sees a
   stale `.next`. That staleness is a **local dev** problem only (see below).

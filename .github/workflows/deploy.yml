@@ -27,5 +27,5 @@ jobs:
           EOF
           chmod +x /tmp/git-askpass.sh
           export GIT_ASKPASS=/tmp/git-askpass.sh
-          git remote add amvera https://git.msk0.amvera.ru/miordanus/most
-          git push amvera HEAD:main --force
+          git remote add amvera https://git.msk1.amvera.ru/miordanus/most
+          git push amvera HEAD:master --force
