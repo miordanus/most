@@ -3,7 +3,6 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'sfzyqdpckgyznuhunygj.supabase.co' },
-      { protocol: 'https', hostname: 'eda.yandex' },
     ],
   },
 }
