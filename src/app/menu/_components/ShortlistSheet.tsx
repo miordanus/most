@@ -5,7 +5,8 @@ import { BottomSheet, type SheetVariant } from './BottomSheet'
 import { ArchMark } from './brand/ArchMark'
 import { DishMedia } from './brand/DishMedia'
 import { Icon } from './brand/Icon'
-import { copy, fmtPriceWithRub } from '@/menu/copy'
+import { copy, fmtApproxRub, fmtPriceWithRub } from '@/menu/copy'
+import { isEstimate, isUnpriced } from '@/lib/menu/price'
 
 export function ShortlistSheet({
   open,
@@ -25,14 +26,22 @@ export function ShortlistSheet({
   variant?: SheetVariant
 }) {
   const total = items.reduce((s, it) => s + it.lineTotal * it.qty, 0)
+  const approx = items.some((it) => isEstimate(it.dish))
+  const hasUnpriced = items.some((it) => isUnpriced(it.dish))
   const empty = items.length === 0
 
   const footer = empty ? null : (
     <div className="mb-short-summary">
       <div className="mb-short-total-row">
-        <span className="mb-short-total-l">Итого</span>
-        <span className="mb-short-total-v">{fmtPriceWithRub(total)}</span>
+        <span className="mb-short-total-l">
+          {approx || hasUnpriced ? copy.short.totalApprox : copy.short.total}
+        </span>
+        <span className="mb-short-total-v">
+          {approx || hasUnpriced ? fmtApproxRub(total) : fmtPriceWithRub(total)}
+        </span>
       </div>
+      {approx && <p className="mb-short-note">{copy.short.approxNote}</p>}
+      {hasUnpriced && <p className="mb-short-note">{copy.short.unpricedNote}</p>}
       <div className="mb-short-banner">
         <ArchMark size={32} />
         <div>
@@ -116,6 +125,13 @@ function ShortItem({
       </div>
       <div className="mb-short-item-body">
         <div className="mb-short-item-name">{dish.name}</div>
+        {dish.pricePer100g && dish.price != null && dish.price !== 0 && (
+          <div className="mb-short-extras">
+            {dish.weight
+              ? `${copy.card.approx}${dish.weight} ${copy.detail.nut.g} · ${fmtPriceWithRub(dish.price)} ${copy.card.per100}`
+              : `${copy.short.weighUnknown} · ${fmtPriceWithRub(dish.price)} ${copy.card.per100}`}
+          </div>
+        )}
         {extras.length > 0 && (
           <div className="mb-short-extras">{extras.join(' · ')}</div>
         )}
@@ -129,7 +145,18 @@ function ShortItem({
               <Icon name="plus" size={14} />
             </button>
           </div>
-          <div className="mb-short-line-total">{fmtPriceWithRub(lineTotal * qty)}</div>
+          <div className="mb-short-line-total">
+            {isUnpriced(dish) ? (
+              <>
+                {fmtPriceWithRub(dish.price)}
+                <span className="mb-price-unit">{copy.card.per100}</span>
+              </>
+            ) : isEstimate(dish) ? (
+              fmtApproxRub(lineTotal * qty)
+            ) : (
+              fmtPriceWithRub(lineTotal * qty)
+            )}
+          </div>
         </div>
       </div>
     </div>

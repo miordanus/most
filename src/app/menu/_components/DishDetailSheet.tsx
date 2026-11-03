@@ -5,7 +5,8 @@ import type { Dish, Addon, Mod, Option } from '@/lib/menu/types'
 import { BottomSheet, type SheetVariant } from './BottomSheet'
 import { DishMedia } from './brand/DishMedia'
 import { Icon } from './brand/Icon'
-import { copy, fmtNum, fmtPriceWithRub } from '@/menu/copy'
+import { copy, fmtApproxRub, fmtNum, fmtPriceWithRub } from '@/menu/copy'
+import { isEstimate, isUnpriced, portionPrice } from '@/lib/menu/price'
 
 export type AddPayload = {
   dish: Dish
@@ -56,7 +57,7 @@ export function DishDetailSheet({
     (s, m) => s + (modsSel[m.id] ? m.price : 0),
     0,
   )
-  const basePrice = dish.price ?? 0
+  const basePrice = portionPrice(dish)
   const lineTotal = basePrice + addonsTotal + modsTotal
 
   const toggleAddon = (id: string) =>
@@ -83,7 +84,18 @@ export function DishDetailSheet({
       }}
     >
       <span>{copy.detail.cta}</span>
-      <span className="mb-cta-price">{fmtPriceWithRub(lineTotal)}</span>
+      <span className="mb-cta-price">
+        {isUnpriced(dish) ? (
+          <>
+            {fmtPriceWithRub(dish.price)}
+            <span className="mb-price-unit">{copy.card.per100}</span>
+          </>
+        ) : isEstimate(dish) ? (
+          fmtApproxRub(lineTotal)
+        ) : (
+          fmtPriceWithRub(lineTotal)
+        )}
+      </span>
     </button>
   )
 
@@ -130,10 +142,13 @@ export function DishDetailSheet({
       <div className="mb-detail-content">
         <h2 className="mb-detail-name">{dish.name}</h2>
         {dish.desc && <p className="mb-detail-desc">{dish.desc}</p>}
+        {dish.pricePer100g && dish.price != null && dish.price !== 0 && (
+          <p className="mb-detail-weigh">{copy.detail.weighNote(dish.weight)}</p>
+        )}
 
         {hasAnyNutri(dish) && (
           <div className="mb-nutri">
-            <NutCell label={copy.detail.nut.g} value={dish.weight} />
+            <NutCell label={copy.detail.nut.g} value={dish.weight} approx={dish.pricePer100g} />
             <NutCell label={copy.detail.nut.kcal} value={dish.kcal} />
             <NutCell label={copy.detail.nut.protein} value={dish.protein} />
             <NutCell label={copy.detail.nut.fat} value={dish.fat} />
@@ -227,11 +242,11 @@ export function DishDetailSheet({
   )
 }
 
-function NutCell({ label, value }: { label: string; value: number | null }) {
+function NutCell({ label, value, approx = false }: { label: string; value: number | null; approx?: boolean }) {
   if (value == null || value === 0) return null
   return (
     <div className="mb-nutri-cell">
-      <div className="mb-nutri-v">{fmtNum(value)}</div>
+      <div className="mb-nutri-v">{approx && copy.card.approx}{fmtNum(value)}</div>
       <div className="mb-nutri-l">{label}</div>
     </div>
   )

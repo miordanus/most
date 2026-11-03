@@ -4,7 +4,7 @@ export function HeartCounter({
   color = 'currentColor',
   strokeWidth = 1.8,
 }: {
-  count?: number
+  count?: number | null
   size?: number
   color?: string
   strokeWidth?: number
@@ -18,18 +18,22 @@ export function HeartCounter({
         strokeWidth={strokeWidth}
         strokeLinejoin="round"
       />
-      <text
-        x="16"
-        y="14.7"
-        textAnchor="middle"
-        dominantBaseline="central"
-        fontFamily="var(--font-jetbrains), 'JetBrains Mono', monospace"
-        fontWeight={600}
-        fontSize={13}
-        fill={color}
-      >
-        {count}
-      </text>
+      {count != null && (
+        <>
+          {/* Alphabetic baseline (not `central`, which Safari/Chrome place differently):
+              puts the digit's ink centre on the heart's area centroid (y≈14.4). */}
+          <text
+            x="16"
+            y="19.05"
+            textAnchor="middle"
+            fontWeight={600}
+            fontSize={13}
+            fill={color}
+          >
+            {count}
+          </text>
+        </>
+      )}
     </svg>
   )
 }

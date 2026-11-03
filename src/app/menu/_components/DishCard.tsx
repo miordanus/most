@@ -27,7 +27,6 @@ export function DishCard({
     >
       <div className="mb-dish-media">
         <DishMedia photo={dish.photo} ratio="3 / 2" markScale={0.55} alt={dish.name} sizes="(max-width: 900px) 50vw, 25vw" />
-        {dish.featured && <div className="mb-dish-flag">{copy.card.focusFlag}</div>}
         <button
           className={'mb-dish-add' + (inList ? ' is-in' : '')}
           onClick={(e) => {
@@ -48,6 +47,7 @@ export function DishCard({
             <div className="mb-dish-meta">
               {hasVal(dish.weight) && (
                 <span>
+                  {dish.pricePer100g && copy.card.approx}
                   {fmtNum(dish.weight)}
                   {copy.detail.nut.g}
                 </span>

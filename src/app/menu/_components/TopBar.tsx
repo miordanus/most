@@ -25,8 +25,11 @@ export function TopBar({
           onClick={onOpenShortlist}
           aria-label={copy.topbar.favoritesAria(listCount)}
         >
-          <HeartCounter count={listCount} size={wordmarkSize + 12} color="currentColor" />
-          <span className="mb-fav-label">{copy.topbar.favorites}</span>
+          <HeartCounter count={null} size={wordmarkSize + 12} color="currentColor" />
+          <span className="mb-fav-label">
+            {copy.topbar.favorites}
+            {copy.topbar.count(listCount)}
+          </span>
         </button>
       </div>
     </div>

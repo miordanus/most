@@ -5,6 +5,7 @@ import type { Category, Dish, ShortlistItem } from '@/lib/menu/types'
 import { TopBar } from './TopBar'
 import { CategoryPills } from './CategoryPills'
 import { FeaturedStrip } from './FeaturedStrip'
+import { portionPrice } from '@/lib/menu/price'
 import { CategorySection } from './CategorySection'
 import { MenuFooter } from './MenuFooter'
 import { DishDetailSheet, type AddPayload } from './DishDetailSheet'
@@ -169,7 +170,7 @@ export function MenuApp({
         addons: [],
         mods: [],
         option: opt,
-        lineTotal: dish.price ?? 0,
+        lineTotal: portionPrice(dish),
       })
     },
     [addToList],
