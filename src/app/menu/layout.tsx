@@ -14,7 +14,7 @@ export default function MenuLayout({ children }: { children: React.ReactNode }) 
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link
-        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap&subset=cyrillic,latin"
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap&subset=cyrillic,latin"
         rel="stylesheet"
       />
       <div className="menu-root">{children}</div>

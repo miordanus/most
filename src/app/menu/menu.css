@@ -15,6 +15,9 @@
   --accent-h: #e85a5f;
   --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.4);
   --shadow-2: 0 24px 60px rgba(0, 0, 0, 0.55);
+  /* Font families. Loaded via <link> in layout.tsx (not next/font). */
+  --font-montserrat: 'Montserrat';
+  --font-jetbrains: 'JetBrains Mono';
 
   background: var(--bg);
   color: var(--text-1);
