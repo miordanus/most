@@ -23,10 +23,13 @@ CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 "$CHROME" --headless=new --hide-scrollbars --disable-gpu \
   --screenshot=tmp/screenshots/menu-desktop.png --window-size=1280,1600 \
   --virtual-time-budget=5000 http://localhost:3000/menu 2>/dev/null
-"$CHROME" --headless=new --hide-scrollbars --disable-gpu \
-  --screenshot=tmp/screenshots/menu-mobile.png --window-size=390,1800 \
-  --virtual-time-budget=5000 http://localhost:3000/menu 2>/dev/null
 ```
+
+**Mobile: don't use headless `--window-size=390`.** Headless Chrome lays the page out wider
+(~500px) and crops it, which fakes a horizontal-overflow bug (2nd grid column and the
+«ИЗБРАННОЕ» heart look cut off). Use the in-app browser pane instead: `resize_window`
+preset `mobile` (375×812), navigate to `/menu`, screenshot; reset to `desktop` after.
+Sanity check: `document.documentElement.scrollWidth` should equal 375.
 
 Then `Read` both PNGs — do NOT trust that the diff "looks right in the editor".
 If a font size, padding, margin, asset ratio, or alignment shifted, **call it out before

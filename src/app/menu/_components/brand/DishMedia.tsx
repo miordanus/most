@@ -7,12 +7,14 @@ export function DishMedia({
   markScale = 0.55,
   alt = '',
   sizes,
+  priority = false,
 }: {
   photo: string | null
   ratio?: string
   markScale?: number
   alt?: string
   sizes?: string
+  priority?: boolean
 }) {
   if (!photo) {
     return <ArchPlaceholder ratio={ratio} markScale={markScale} />
@@ -32,6 +34,7 @@ export function DishMedia({
         alt={alt}
         fill
         sizes={sizes ?? '(max-width: 900px) 50vw, 33vw'}
+        priority={priority}
         style={{ objectFit: 'cover' }}
         unoptimized={false}
       />

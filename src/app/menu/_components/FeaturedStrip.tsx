@@ -25,7 +25,7 @@ export function FeaturedStrip({
           return (
             <article key={d.id} className="mb-featured-card" onClick={() => onOpen(d)}>
               <div className="mb-featured-media">
-                <DishMedia photo={d.photo} ratio="4 / 5" alt={d.name} sizes="(max-width: 900px) 70vw, 33vw" />
+                <DishMedia photo={d.photo} ratio="1 / 1" alt={d.name} sizes="(max-width: 900px) 70vw, 33vw" priority />
                 <div className="mb-featured-badge">{copy.featured.badge}</div>
                 <button
                   className={'mb-featured-fav' + (inList ? ' is-in' : '')}
