@@ -9,7 +9,7 @@ function safeEqual(a: string, b: string) {
   return diff === 0
 }
 
-export function middleware(req: NextRequest) {
+function menudqAuth(req: NextRequest) {
   const password = process.env.MENUDQ_PASSWORD
   if (!password) {
     if (process.env.NODE_ENV !== 'production') return NextResponse.next()
@@ -30,6 +30,26 @@ export function middleware(req: NextRequest) {
   })
 }
 
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl
+
+  const slug = process.env.MENU_GATE_SLUG
+  if (slug) {
+    if (pathname === `/${slug}`) {
+      return NextResponse.rewrite(new URL('/menu', req.url))
+    }
+    if (pathname.startsWith(`/${slug}/`)) {
+      const rest = pathname.slice(slug.length + 1)
+      return NextResponse.rewrite(new URL(`/menu${rest}`, req.url))
+    }
+    return new NextResponse(null, { status: 404 })
+  }
+
+  if (pathname === '/menudq' || pathname.startsWith('/menudq/')) return menudqAuth(req)
+
+  return NextResponse.next()
+}
+
 export const config = {
-  matcher: ['/menudq', '/menudq/:path*'],
+  matcher: ['/((?!_next/|favicon.ico|robots.txt|assets/).*)'],
 }
