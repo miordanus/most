@@ -16,3 +16,4 @@ tmp/
 
 # dish-photo originals (kept locally only, never committed)
 most-photos/
+!.env.production

@@ -7,17 +7,18 @@
     "dev:clean": "rm -rf .next node_modules/.cache && next dev",
     "prepare": "git config core.hooksPath .githooks || true",
     "build": "next build",
-    "start": "next start",
+    "start": "node scripts/start.mjs",
     "test": "node --import tsx --test \"src/**/*.test.ts\"",
     "photos:stage": "node scripts/menu/photos_stage.mjs",
     "photos:reapply": "node scripts/menu/photos_reapply.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
-    "next": "14.2.5",
+    "next": "14.2.35",
     "react": "^18",
     "react-dom": "^18",
-    "react-easy-crop": "^5.5.7"
+    "react-easy-crop": "^5.5.7",
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -25,7 +26,6 @@
     "@types/react-dom": "^18",
     "autoprefixer": "^10",
     "postcss": "^8",
-    "sharp": "^0.33.5",
     "tailwindcss": "^3.4",
     "tsx": "^4.22.3",
     "typescript": "^5"
